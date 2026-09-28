@@ -1,20 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 01-base-y-acceso-seguro
 source: [01-VERIFICATION.md]
 started: 2026-09-28T13:00:00Z
-updated: 2026-09-28T13:15:00Z
+updated: 2026-09-28T13:30:00Z
 ---
 
 ## Current Test
 
-number: 2
-name: Visual/marca en pantalla de teléfono (375px) (Plan 01-04)
-expected: |
-  Con `npm run dev` corriendo, abre http://localhost:3000 en una ventana de 375px de ancho
-  (modo dispositivo del navegador). El logo y el botón morado (#482583) se ven bien en ese
-  tamaño; el diseño es de una sola columna, cómodo de tocar con el dedo.
-awaiting: user response
+None — all 4 items resolved.
 
 ## Tests
 
@@ -42,7 +36,7 @@ expected: |
   Con `npm run dev` corriendo, abre http://localhost:3000 en una ventana de 375px de ancho
   (modo dispositivo del navegador). El logo y el botón morado (#482583) se ven bien en ese
   tamaño; el diseño es de una sola columna, cómodo de tocar con el dedo.
-result: [pending]
+result: aprobado
 
 ### 3. Login real con gabbovera@gmail.com (Plan 01-04)
 expected: |
@@ -50,17 +44,25 @@ expected: |
   "Sesión iniciada como gabbovera@gmail.com". Presiona "Cerrar sesión" y confirma que vuelve
   al login. Prueba una contraseña incorrecta y confirma que muestra
   "Correo o contraseña incorrectos." en español.
-result: [pending]
+result: aprobado
 
 ### 4. Persistencia de sesión al día siguiente — D-01 (Plan 01-04)
 expected: |
   Al día siguiente de iniciar sesión, reabre el mismo navegador en /admin. El panel debe abrir
   directo, sin pedir la contraseña de nuevo (sesión larga, como WhatsApp Web). Esto no se puede
   simular con una prueba automática que corre en segundos.
-result: [pending]
+result: aceptado por confianza en la verificación automática (owner eligió cerrar la fase ahora en vez de esperar un día)
+notes: |
+  No se pudo probar en vivo por requerir el paso de un día real. El owner decidió cerrar la
+  Fase 1 confiando en la doble verificación automática ya hecha: (1) Plan 01-02's
+  configure-auth.mjs confirmó vía la Management API de Supabase que no hay límite de duración
+  de sesión, ni cierre por inactividad, ni límite de una sola sesión por usuario; (2)
+  @supabase/ssr usa por defecto una cookie de 400 días y un refresh token sin expiración. Si
+  el owner nota mañana que le pide la contraseña de nuevo, es un hallazgo a reportar, no algo
+  ya cerrado en falso — quedó documentado aquí para trazabilidad.
 
 ## Summary
 
 total: 4
-passed: 1
+passed: 4
 issues: 0
