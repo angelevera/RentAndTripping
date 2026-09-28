@@ -6,12 +6,20 @@
 //
 // Uso: npm run auth:configure
 
-process.loadEnvFile(".env.local");
-process.loadEnvFile(".env.admin.local");
-
 function fail(mensaje) {
   console.error(`Error: ${mensaje}`);
   process.exit(1);
+}
+
+for (const archivo of [".env.local", ".env.admin.local"]) {
+  try {
+    process.loadEnvFile(archivo);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      fail(`Falta ${archivo}. Copia .env.example y complétalo antes de correr este script.`);
+    }
+    throw error;
+  }
 }
 
 const projectRef = process.env.SUPABASE_PROJECT_REF;
