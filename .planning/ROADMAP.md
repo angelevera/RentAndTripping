@@ -33,12 +33,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Nadie que no sea el admin puede entrar al panel de administración.
   3. La estructura de datos para reservas, pagos y clientes ya existe y está protegida a nivel de base de datos (no solo escondida en la pantalla), lista para que las próximas fases construyan sobre ella con confianza.
 
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Esqueleto andante: paquetes aprobados, proyecto enlazado a Supabase, y el admin entra por /login y llega a /admin (tracer)
+- [x] 01-01-PLAN.md — Esqueleto andante: paquetes aprobados, proyecto enlazado a Supabase, y el admin entra por /login y llega a /admin (tracer)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -133,7 +133,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Base y acceso seguro | 0/4 | Planned | - |
+| 1. Base y acceso seguro | 1/4 | In Progress|  |
 | 2. Gestión de reservas (admin) | 0/TBD | Not started | - |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |

@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 01
 current_phase_name: Base y acceso seguro
 status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-09-28T03:05:33.360Z"
-last_activity: 2026-09-27
-last_activity_desc: Roadmap creado a partir de PROJECT.md, REQUIREMENTS.md e investigación (research/SUMMARY.md)
-state_head: 8a344f639c04269ca2978b4eed211d0855026496
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-09-28T16:13:32.124Z"
+last_activity: 2026-09-28
+last_activity_desc: Phase 01 execution started
+state_head: 1d55d98a87273a450516c3d38eff07ea5411df1b
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-27)
 
 **Core value:** Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar para crear reservas, cobrar, confirmar pagos y darles seguimiento — sin perder ninguna.
-**Current focus:** Phase 1 — Base y acceso seguro
+**Current focus:** Phase 01 — Base y acceso seguro
 
 ## Current Position
 
-Phase: 01 (Base y acceso seguro) — READY TO EXECUTE
-Plan: 0 of TBD in current phase
+Phase: 01 (Base y acceso seguro) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-09-27 — Roadmap creado a partir de PROJECT.md, REQUIREMENTS.md e investigación (research/SUMMARY.md)
+Last activity: 2026-09-28 — Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -54,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 55min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -65,6 +70,9 @@ Recent decisions affecting current work:
 - [Research]: Stack confirmado — Next.js 16 + Supabase + Vercel Pro (Hobby plan prohíbe uso comercial)
 - [Research]: Notificaciones/recordatorios vía Resend + Supabase Cron (Supabase solo no envía mensajes)
 - [Roadmap]: 5 fases (no 6) — la "prueba real con reservas en vivo" sugerida por la investigación se incorporó como criterio de éxito final de la Fase 5, en vez de ser una fase separada sin requisitos propios
+- [Phase 01]: Single hosted Supabase project for dev + automated tests, namespaced rt-test- fixtures with 30-min sweep (FA-4)
+- [Phase 01]: shadcn/ui init deferred to Phase 2 UI contract; Task 3 login/admin markup uses plain Tailwind for now
+- [Phase 01]: Worktree isolation disabled project-wide because gitignored Supabase secrets are not visible inside an isolated worktree
 
 ### Pending Todos
 
@@ -85,6 +93,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-27T22:44:01.567Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-base-y-acceso-seguro/01-CONTEXT.md
+Last session: 2026-09-28T16:13:32.115Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None
