@@ -78,4 +78,18 @@ describe("admin login skeleton (/login -> /admin)", () => {
     expect(location).toBeTruthy();
     expect(new URL(location as string, baseUrl).pathname).toBe("/login");
   });
+
+  it("la raíz / lleva a /admin", async () => {
+    const baseUrl = inject("baseUrl");
+
+    const response = await fetch(new URL("/", baseUrl), {
+      redirect: "manual",
+    });
+
+    expect(response.status).toBeGreaterThanOrEqual(300);
+    expect(response.status).toBeLessThan(400);
+    const location = response.headers.get("location");
+    expect(location).toBeTruthy();
+    expect(new URL(location as string, baseUrl).pathname).toBe("/admin");
+  });
 });
