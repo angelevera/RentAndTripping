@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Nadie que no sea el admin puede entrar al panel de administración.
   3. La estructura de datos para reservas, pagos y clientes ya existe y está protegida a nivel de base de datos (no solo escondida en la pantalla), lista para que las próximas fases construyan sobre ella con confianza.
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans executed
 
 Plans:
 **Wave 1**
@@ -47,7 +47,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-04-PLAN.md — Entrada con la marca y formulario validado en español (funciona sin JavaScript)
+- [x] 01-04-PLAN.md — Entrada con la marca y formulario validado en español (funciona sin JavaScript)
 
 ### Phase 2: Gestión de reservas (admin)
 
@@ -133,7 +133,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Base y acceso seguro | 3/4 | In Progress|  |
+| 1. Base y acceso seguro | 4/4 | In Progress|  |
 | 2. Gestión de reservas (admin) | 0/TBD | Not started | - |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |

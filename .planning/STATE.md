@@ -2,17 +2,17 @@
 gsd_state_version: "1.0"
 current_phase: 01
 current_phase_name: Base y acceso seguro
-status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-09-28T16:40:56.214Z"
+status: verifying
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-09-28T16:52:32.036Z"
 last_activity: 2026-09-28
 last_activity_desc: Phase 01 execution started
-state_head: f6939867aa71ff30ac8339f71f2b591a63e1a627
+state_head: f101297f23587faf81e835da8be8f2439983a2bd
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 Phase: 01 (Base y acceso seguro) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-28 — Phase 01 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -61,6 +61,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P01 | 55min | 3 tasks | 10 files |
 | Phase 01 P02 | 45min | 2 tasks | 8 files |
 | Phase 01 P03 | 35min | 3 tasks | 8 files |
+| Phase 01 P04 | 25min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 01]: No custom session-duration, single-session, or forced-logout code added anywhere — D-01/D-02 come entirely from @supabase/ssr and Supabase Auth defaults, verified by npm run auth:configure
 - [Phase 01]: Auth-hardening test for signUp rejection asserts error.code === 'signup_disabled' specifically, not just any error, after discovering an unrelated email rate-limit error could produce a false-positive RED
 - [Phase 01]: precio+moneda (no precio_usd) en reservas, on delete restrict pagos->reservas, recordatorios sin lectura para clientes, comprobantes sin update/delete para el cliente — todo ya especificado en 01-03-PLAN.md, no descubierto en ejecucion
+- [Phase 01]: app/admin/page.tsx dejado sin cambios en 01-04 — ya renderiza correctamente dentro del nuevo layout de marca, sin tocar nada propio
+- [Phase 01]: un solo esquema zod (lib/validation/auth.ts) usado tanto por zodResolver en el cliente como por safeParse en el servidor — sin reglas de validación duplicadas
+- [Phase 01]: mensaje idéntico en español para contraseña incorrecta y correo desconocido (sin revelar cuentas), con el 429 de Supabase mapeado a un mensaje de límite de intentos distinto
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-28T16:40:56.204Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-09-28T16:52:32.025Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

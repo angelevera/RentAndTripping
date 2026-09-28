@@ -9,7 +9,7 @@ Requisitos para el lanzamiento inicial (MVP). Cada uno se mapea a una fase del r
 
 ### Autenticación (AUTH)
 
-- [ ] **AUTH-01**: El admin puede iniciar sesión como único usuario administrador
+- [x] **AUTH-01**: El admin puede iniciar sesión como único usuario administrador
 - [ ] **AUTH-02**: El cliente puede iniciar sesión y ver solo sus propias reservas (protegido con seguridad a nivel de fila — Row Level Security — no solo ocultado en la interfaz)
 
 ### Reservas (RESA)
@@ -73,7 +73,7 @@ Exclusiones permanentes (no solo pospuestas), con su razón.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 3 | Pending |
 | RESA-01 | Phase 2 | Pending |
 | RESA-02 | Phase 2 | Pending |
@@ -89,6 +89,7 @@ Exclusiones permanentes (no solo pospuestas), con su razón.
 | AVISO-02 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 14 total
 - Mapped to phases: 14
 - Unmapped: 0 ✓
