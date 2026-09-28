@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import path from "node:path";
+import { loadEnv } from "vite";
 import type { TestProject } from "vitest/node";
 
 declare module "vitest" {
@@ -63,9 +64,15 @@ export default async function setup({ provide }: TestProject) {
   const port = await findFreePort();
   const baseUrl = `http://localhost:${port}`;
 
+  // globalSetup runs in its own process, separate from the test-file worker
+  // that Vitest's `test.env` (vitest.config.ts's loadEnv('admin', ...))
+  // populates — process.env here does NOT already carry NEXT_PUBLIC_* or the
+  // admin-only vars, so load them directly from the same env files.
+  const loadedEnv = loadEnv("admin", process.cwd(), "");
+
   // Strip admin-only secrets from the child's environment — the running app
   // must never be able to see them, even by accident.
-  const childEnv: NodeJS.ProcessEnv = { ...process.env };
+  const childEnv: NodeJS.ProcessEnv = { ...process.env, ...loadedEnv };
   for (const key of ADMIN_ONLY_VARS) {
     delete childEnv[key];
   }

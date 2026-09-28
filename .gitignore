@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Next.js 16's `next dev` auto-writes an agent-rules block to a root-level
+# AGENTS.md (and a root CLAUDE.md that just @-imports it) on every dev-server
+# start. This project's instructions live in .claude/CLAUDE.md — never these.
+/AGENTS.md
+/CLAUDE.md
