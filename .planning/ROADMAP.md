@@ -13,7 +13,7 @@ El camino va de "nada existe todavía" a "el operador reemplazó su flujo manual
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Base y acceso seguro** - Base de datos protegida y el admin puede iniciar sesión
+- [x] **Phase 1: Base y acceso seguro** - Base de datos protegida y el admin puede iniciar sesión (completed 2026-09-28)
 - [ ] **Phase 2: Gestión de reservas (admin)** - El admin crea, edita y da seguimiento a todas las reservas en un solo lugar
 - [ ] **Phase 3: Panel de cliente** - Cada cliente entra a su propia cuenta y ve solo sus reservas
 - [ ] **Phase 4: Pagos, comprobantes y confirmación** - Se registra el cobro, se sube el comprobante y el admin confirma con un clic
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Nadie que no sea el admin puede entrar al panel de administración.
   3. La estructura de datos para reservas, pagos y clientes ya existe y está protegida a nivel de base de datos (no solo escondida en la pantalla), lista para que las próximas fases construyan sobre ella con confianza.
 
-**Plans:** 4/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 **Wave 1**
@@ -64,6 +64,7 @@ Plans:
   4. El admin puede marcar una reserva como "confirmada con el proveedor" de forma independiente a si ya fue pagada o no.
 
 **Notes:**
+
 - **Pagador vs. viajero** (confirmado en el UAT de Fase 1, 2026-09-28): quien paga una reserva no siempre es quien viaja. El pagador puede tener cuenta; el viajero puede no tenerla y no tener correo. El modelo de datos de esta fase debe distinguir ambos roles en `reservas`. Esto se implementa como una **migración nueva** (siguiente número de timestamp) — no se edita `20260927000002_reservas_pagos_recordatorios.sql` ni `20260927000003_comprobantes_privados.sql`, ya aplicadas en Fase 1. Ver PROJECT.md → Key Decisions.
 - Este cambio de esquema habilita, pero no implementa, la gestión de reservas de familiares por el pagador — esa funcionalidad es una decisión de alcance de **Fase 3** (ver su nota abajo).
 
@@ -87,6 +88,7 @@ Plans:
   3. Tanto el cliente como el admin pueden ver el historial de reservas pasadas de ese cliente.
 
 **Notes:**
+
 - **Decisión de alcance pendiente** (ver Fase 2 → Notes, confirmado en el UAT de Fase 1): ¿puede el pagador ver y gestionar las reservas de sus familiares (viajeros sin cuenta propia)? El modelo de datos de Fase 2 lo permite; si esta fase decide construirlo, úsese `/gsd-discuss-phase 3` para fijar el alcance antes de planear.
 - **Deuda pendiente de la revisión de código de Fase 1 (WR-01, 2026-09-28):** hoy `/login` revela si una contraseña es correcta aunque la cuenta no sea admin (mensaje distinto al de "correo/contraseña incorrectos"). El riesgo es bajo hoy (una sola cuenta admin, registro público cerrado), pero se vuelve relevante cuando esta fase agregue cuentas de cliente reales al mismo `/login` compartido. Diseñar el arreglo junto con el flujo de login del cliente, no antes — el intento de arreglarlo en Fase 1 rompió la prueba que confirma que `/login` es la puerta de entrada compartida. Ver `01-REVIEW.md`/`01-REVIEW-FIX.md` en la carpeta de Fase 1 para el detalle técnico.
 
@@ -141,7 +143,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Base y acceso seguro | 4/4 | In Progress|  |
+| 1. Base y acceso seguro | 4/4 | Complete    | 2026-09-28 |
 | 2. Gestión de reservas (admin) | 0/TBD | Not started | - |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
