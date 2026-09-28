@@ -14,19 +14,26 @@ export interface AdminSession {
   email: string | undefined;
 }
 
+type SessionStatus =
+  | { status: "none" }
+  | { status: "not-admin" }
+  | { status: "admin"; session: AdminSession };
+
 /**
- * Devuelve la sesión del admin si el usuario autenticado tiene
- * profiles.role = 'admin', o null en cualquier otro caso (sin sesión, o
- * sesión de un cliente). No redirige — pensado para el login (Plan 01-04),
- * que necesita mandar a un admin ya conectado directo a /admin.
+ * Única implementación de la comprobación de sesión+rol (la más crítica de
+ * todo el código de seguridad): llama a getClaims() y lee profiles.role.
+ * getAdminSession() y requireAdmin() son las dos únicas formas permitidas de
+ * consumirla — ambas componen este resultado en vez de repetir la consulta,
+ * para que una futura corrección (ej. una columna disabled) no pueda
+ * aplicarse a una y olvidarse en la otra.
  */
-export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
+const getSessionStatus = cache(async (): Promise<SessionStatus> => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
 
   if (!claims) {
-    return null;
+    return { status: "none" };
   }
 
   const { data: perfil } = await supabase
@@ -36,10 +43,21 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
     .single();
 
   if (perfil?.role !== "admin") {
-    return null;
+    return { status: "not-admin" };
   }
 
-  return { userId: claims.sub, email: claims.email };
+  return { status: "admin", session: { userId: claims.sub, email: claims.email } };
+});
+
+/**
+ * Devuelve la sesión del admin si el usuario autenticado tiene
+ * profiles.role = 'admin', o null en cualquier otro caso (sin sesión, o
+ * sesión de un cliente). No redirige — pensado para el login (Plan 01-04),
+ * que necesita mandar a un admin ya conectado directo a /admin.
+ */
+export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
+  const resultado = await getSessionStatus();
+  return resultado.status === "admin" ? resultado.session : null;
 });
 
 /**
@@ -51,23 +69,15 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
  *   - Admin → devuelve { userId, email }
  */
 export async function requireAdmin(): Promise<AdminSession> {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const claims = data?.claims;
+  const resultado = await getSessionStatus();
 
-  if (!claims) {
+  if (resultado.status === "none") {
     redirect("/login");
   }
 
-  const { data: perfil } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", claims.sub)
-    .single();
-
-  if (perfil?.role !== "admin") {
+  if (resultado.status === "not-admin") {
     redirect("/login?motivo=sin-acceso");
   }
 
-  return { userId: claims.sub, email: claims.email };
+  return resultado.session;
 }
