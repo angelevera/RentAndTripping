@@ -163,6 +163,10 @@ None — already satisfied per Task 2's precondition. The user had already writt
 - `tests/helpers/fixtures.ts` is stable and ready for later plans to **add** exports to (never remove/rename existing ones, per the plan's own contract).
 - Flagged for owner confirmation before Phase 2 UI work: the `shadcn/ui init` re-scope (Task 3 uses plain Tailwind for now) and the `profiles`/`reservas`/`pagos`/`recordatorios` schema design (FA-3, Claude's-discretion greenfield choice).
 
+## Self-Check: PASSED
+
+All 10 created files confirmed present on disk (`package.json`, `vitest.config.ts`, `tests/e2e/global-setup.ts`, `tests/helpers/fixtures.ts`, `supabase/migrations/20260927000001_perfiles_y_rol_admin.sql`, `lib/supabase/server.ts`, `app/login/page.tsx`, `app/admin/page.tsx`, `tests/e2e/admin-login.test.ts`, this SUMMARY). All 4 commits confirmed present in `git log --oneline --all` (`46bfd01`, `25e1db9`, `1d55d98`, `774e9b2`).
+
 ---
 *Phase: 01-base-y-acceso-seguro*
 *Completed: 2026-09-28*
