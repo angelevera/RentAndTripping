@@ -1,47 +1,58 @@
 ---
 phase: 01-base-y-acceso-seguro
-verified: 2026-09-28T13:05:00Z
-status: human_needed
+verified: 2026-09-28T14:10:00Z
+status: passed
 score: 31/31 must-haves verified (all 4 plans)
 behavior_unverified: 0
 overrides_applied: 0
-covered_files: [".planning/REQUIREMENTS.md", ".planning/phases/01-base-y-acceso-seguro/01-01-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-01-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-02-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-02-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-03-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-03-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-04-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-04-SUMMARY.md", "app/admin/actions.ts", "app/admin/page.tsx", "app/globals.css", "app/layout.tsx", "app/login/actions.ts", "app/login/login-form.tsx", "app/login/page.tsx", "app/page.tsx", "lib/auth/require-admin.ts", "lib/database.types.ts", "lib/supabase/server.ts", "lib/validation/auth.ts", "package.json", "proxy.ts", "scripts/configure-auth.mjs", "scripts/seed-admin.mjs", "supabase/migrations/20260927000001_perfiles_y_rol_admin.sql", "supabase/migrations/20260927000002_reservas_pagos_recordatorios.sql", "supabase/migrations/20260927000003_comprobantes_privados.sql", "tests/auth/auth-hardening.test.ts", "tests/e2e/admin-access.test.ts", "tests/e2e/admin-login.test.ts", "tests/e2e/global-setup.ts", "tests/helpers/fixtures.ts", "tests/rls/aislamiento-clientes.test.ts", "tests/rls/anonimo.test.ts", "tests/rls/comprobantes.test.ts", "tests/rls/perfiles-rol.test.ts", "vitest.config.ts"]
-covered_digest: "v1:sha256:74578005f592979ab76d4a88e4183946b6490bbcb090dac821fbf7ca9c52dae0"
-human_verification:
-  - test: "Datos: lee la sección 'Modelo de datos para revisar' en 01-03-SUMMARY.md y confirma si el modelo (cliente = cuenta creada por el admin; reserva con precio+moneda; pago con método/monto/moneda/tasa; reserva con pagos no se puede borrar; recordatorios internos; comprobantes privados e inmutables para el cliente) coincide con cómo opera el negocio hoy."
-    expected: "El dueño confirma el modelo, o señala qué cambiar antes de que la Fase 2 construya pantallas sobre él. Pregunta clave planteada por el propio plan: ¿habrá clientes que nunca tengan cuenta/correo (p. ej. pago único en efectivo)?"
-    why_human: "Ajuste al modelo de negocio (RESEARCH Assumption A2); no verificable por grep ni por tests automatizados; cambiarlo después de la Fase 2 exige migración + cambios de código coordinados."
-  - test: "Visual/marca en 375px: con `npm run dev` corriendo, abre http://localhost:3000 en una ventana de 375px de ancho (modo dispositivo del navegador) y revisa /login y /admin."
-    expected: "El logo y el botón morado (#482583) se ven bien en pantalla de teléfono; el formulario es usable con el teclado táctil."
-    why_human: "Ajuste visual/de marca no es verificable por grep ni por el test suite (DESIGN.md pide juicio humano)."
-  - test: "Login real: inicia sesión como gabbovera@gmail.com con la contraseña inicial, revisa el panel, presiona 'Cerrar sesión', luego intenta con una contraseña incorrecta."
-    expected: "El panel muestra 'Sesión iniciada como gabbovera@gmail.com'; una contraseña incorrecta muestra 'Correo o contraseña incorrectos.' en español; cerrar sesión regresa a /login."
-    why_human: "Requiere una cuenta real y un navegador real; los tests e2e usan cuentas rt-test- desechables, nunca la cuenta real del operador."
-  - test: "Persistencia de sesión al día siguiente (D-01): reabre el mismo navegador al día siguiente sin cerrar sesión."
-    expected: "El panel abre sin pedir la contraseña de nuevo (cookie de 400 días por defecto de @supabase/ssr, más el refresh en proxy.ts)."
-    why_human: "Una expiración/renovación de sesión de un día no puede simularse en un test e2e que corre en segundos (ver FA-1 en 01-01-PLAN.md: 'no automated expiry simulation')."
+covered_files: [".planning/REQUIREMENTS.md", ".planning/phases/01-base-y-acceso-seguro/01-01-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-01-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-02-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-02-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-03-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-03-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-04-PLAN.md", ".planning/phases/01-base-y-acceso-seguro/01-04-SUMMARY.md", ".planning/phases/01-base-y-acceso-seguro/01-REVIEW-FIX.md", ".planning/phases/01-base-y-acceso-seguro/01-REVIEW.md", ".planning/phases/01-base-y-acceso-seguro/01-UAT.md", "app/admin/actions.ts", "app/admin/page.tsx", "app/globals.css", "app/layout.tsx", "app/login/actions.ts", "app/login/login-form.tsx", "app/login/page.tsx", "app/page.tsx", "lib/auth/require-admin.ts", "lib/database.types.ts", "lib/supabase/server.ts", "lib/validation/auth.ts", "package.json", "proxy.ts", "scripts/configure-auth.mjs", "scripts/seed-admin.mjs", "scripts/with-admin-env.mjs", "supabase/migrations/20260927000001_perfiles_y_rol_admin.sql", "supabase/migrations/20260927000002_reservas_pagos_recordatorios.sql", "supabase/migrations/20260927000003_comprobantes_privados.sql", "supabase/migrations/20260927000004_pagos_tasa_cambio_solo_en_bs.sql", "tests/auth/auth-hardening.test.ts", "tests/e2e/admin-access.test.ts", "tests/e2e/admin-login.test.ts", "tests/e2e/global-setup.ts", "tests/helpers/fixtures.ts", "tests/rls/aislamiento-clientes.test.ts", "tests/rls/anonimo.test.ts", "tests/rls/comprobantes.test.ts", "tests/rls/perfiles-rol.test.ts", "vitest.config.ts"]
+covered_digest: "v1:sha256:415b621898ba6261eeef872162c49dbe170e03ff15eecc433a3cc3d15e954b13"
+re_verification:
+  previous_status: human_needed
+  previous_score: 31/31
+  gaps_closed:
+    - "WR-02: cerrarSesion Server Action now calls requireAdmin() before signing out"
+    - "WR-03: requireAdmin()/getAdminSession() unified on a single getSessionStatus() check"
+    - "WR-04: pagos.tasa_cambio now enforced NULL-iff-USD in both directions (new migration 20260927000004)"
+    - "WR-05: db:push/db:migrations/db:types no longer shell-source .env.admin.local (scripts/with-admin-env.mjs added)"
+    - "WR-06: configure-auth.mjs/seed-admin.mjs now fail with a friendly Spanish message instead of a raw ENOENT stack trace"
+    - "WR-07: stale server-side login error banner is now hidden while a client-side field error is active"
+    - "All 4 original human-verification items resolved by the owner (01-UAT.md, 4/4 aprobado)"
+  gaps_remaining: []
+  regressions: []
+advisory:
+  - finding: "WR-01 (login authenticates non-admin accounts before checking role, creating a valid-credential oracle) is deliberately deferred, not fixed"
+    category: security
+    reason: "A literal fix broke the tested two-tier access design (shared /login for admin + future customer accounts); the owner explicitly deferred this to Phase 3 when real customer accounts exist on the same /login page, and recorded the deferral in ROADMAP.md Phase 3 Notes. Low risk today: single admin account, public signup closed."
+    evidence_status: "Deferral is documented (01-REVIEW-FIX.md skipped-issues section, ROADMAP.md Phase 3 Notes) and reflects a project-owner decision already made, not a new finding from this re-verification. Not counted as a gap per this task's explicit instruction not to re-litigate it."
 ---
 
-# Phase 1: Base y acceso seguro — Verification Report
+# Phase 1: Base y acceso seguro — Verification Report (Re-verification)
 
 **Phase Goal:** "La base de datos existe y está protegida de forma que cada tipo de usuario (admin, cliente) solo puede ver y tocar lo que le corresponde, y el admin ya puede entrar al sistema con su propia cuenta."
-**Verified:** 2026-09-28
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-09-28T14:10:00Z
+**Status:** passed
+**Re-verification:** Yes — after code-review gap closure and end-of-phase UAT sign-off
 
 ## Method
 
-Read all 4 PLAN.md/SUMMARY.md pairs in full, ROADMAP.md, REQUIREMENTS.md, and `.claude/CLAUDE.md`. Independently, in a fresh shell (not trusting any SUMMARY-reported numbers):
+This is a refresh of the 2026-09-28T13:05:00Z initial verification (status `human_needed`), following:
+1. A code-review pass (`01-REVIEW.md`) that found 0 Critical / 7 Warning-tier issues.
+2. A fix pass (`01-REVIEW-FIX.md`) that applied 6 of the 7 warnings (commits `4d6d8ce`, `c5eec24`, `431d275`, `de7b458`, `77d6939`, `a26ea8f`) and deliberately deferred WR-01 to Phase 3 (rolled back cleanly, documented in `ROADMAP.md` Phase 3 Notes).
+3. End-of-phase UAT (`01-UAT.md`) in which the owner resolved all 4 original human-verification items (4/4 `aprobado`).
 
-- Ran `npm run build` — clean, 0 errors.
-- Ran `npm run db:migrations` — confirmed all 3 migrations (`20260927000001/2/3`) applied **Remote** on the live hosted Supabase project.
-- Ran the full test suite (`npm run test`, i.e. `vitest run` across the `db` and `e2e` projects) once, cold: **7 test files, 40/40 tests passed.**
-- Ran it a second time (`npx vitest run --reporter=verbose`) to get per-test names for cross-referencing against each SUMMARY's `coverage` claims — this second run hit Supabase Auth's own login rate limiter (`Request rate limit reached`, plus one assertion catching the "Demasiados intentos" 429-mapped message instead of the expected wrong-password message) because the same hosted project had just been hit by the first full run seconds earlier. This is **not a code defect** — it is a live consequence of Plan 01-04's own rate-limit handling code doing its job (mapping Supabase's 429 to the correct Spanish message), triggered by two back-to-back full-suite runs against a shared hosted project. The first, cold run is the authoritative evidence and matches every SUMMARY-claimed pass count exactly. See "Anti-Patterns / Notable Findings" below — flagged as an info-level operational caution, not a gap.
-- Grepped every acceptance-criteria pattern from all 4 plans directly against the current file contents (not the plan's own claims) — see "Required Artifacts" and "Key Link Verification" below.
-- Read the full contents of `proxy.ts`, `lib/auth/require-admin.ts`, `app/admin/page.tsx`, `app/login/page.tsx`, `app/login/login-form.tsx` to confirm behavior, not just grep hits.
-- Confirmed `.env.local`/`.env.admin.local` are git-ignored and untracked (`git ls-files | grep env` → only `.env.example` and `scripts/check-env.sh`), and that no admin secret name (`SUPABASE_SECRET_KEY`, `SUPABASE_ACCESS_TOKEN`, `ADMIN_INITIAL_PASSWORD`) appears anywhere under `app/`, `lib/`, or `proxy.ts`. Did not read `.env.local`/`.env.admin.local` contents directly, per instructions; used `./scripts/check-env.sh` (exit 0, all 7 vars `OK:`) instead.
-- Confirmed `.claude/CLAUDE.md` is byte-for-byte unchanged across the whole phase: `git diff --quiet -- .claude/CLAUDE.md` exits 0, and `git log --follow -- .claude/CLAUDE.md` shows no commits touching it since the two pre-Phase-1 project-init commits.
-- Scanned every file the phase created/modified for `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER`/"coming soon"/empty-return stubs — none found.
+Independently, in a fresh shell (not trusting SUMMARY/REVIEW-FIX-reported numbers):
+
+- Ran `npm run build` — clean, 0 errors, all 4 routes generated.
+- Ran `npx vitest run --project db` cold — **5 test files, 27/27 tests passed** (matches the required count exactly).
+- Confirmed a `next dev` server was already listening on port 3000 (`lsof -i :3000`), then ran `E2E_BASE_URL=http://localhost:3000 npx vitest run --project e2e` against it (no new server spawned, no port conflict, the running dev server was left untouched) — **2 test files, 13/13 tests passed** (matches the required count exactly).
+- Ran `npm run db:migrations` — confirmed all 4 migrations (`20260927000001` through `20260927000004`) show `local == remote`, i.e. applied on the live hosted Supabase project.
+- Confirmed via `git log --oneline -- <file>` that `20260927000002_reservas_pagos_recordatorios.sql` and `20260927000003_comprobantes_privados.sql` each have exactly one commit (`0a94492`, the original Plan 01-03 commit) with zero commits since — WR-04's fix added a new migration file (`20260927000004`) rather than editing an already-applied one, exactly as documented.
+- Read the full current content of all 6 fixed files/areas (`app/admin/actions.ts`, `lib/auth/require-admin.ts`, `supabase/migrations/20260927000004_pagos_tasa_cambio_solo_en_bs.sql`, `package.json`'s `db:*` scripts + new `scripts/with-admin-env.mjs`, `scripts/configure-auth.mjs`/`scripts/seed-admin.mjs`'s env-loading block, `app/login/login-form.tsx`) and confirmed each matches its REVIEW-FIX claim exactly (not just presence — read the actual logic).
+- Confirmed `app/login/actions.ts` (WR-01, skipped) has zero commits and zero diff since its original Plan 01-04 commit (`f101297`) — the rollback was clean, no partial/broken state left behind.
+- Re-scanned every fixed/added file for `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` — none found.
+- Confirmed `REQUIREMENTS.md` still marks `AUTH-01` `[x] Complete` and Phase 1 still maps only `AUTH-01`.
+- Read `.planning/ROADMAP.md`'s diff (currently unstaged) — the only change is the WR-01 deferral note added to Phase 3's Notes section, consistent with the owner's documented decision; not a scope change to Phase 1.
 
 ## Goal Achievement
 
@@ -49,117 +60,103 @@ Read all 4 PLAN.md/SUMMARY.md pairs in full, ROADMAP.md, REQUIREMENTS.md, and `.
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | El admin puede iniciar sesión con su correo y contraseña y llega a un panel de administración vacío | ✓ VERIFIED | `tests/e2e/admin-login.test.ts` (3 tests) + `tests/e2e/admin-access.test.ts` pass on a cold run against the real hosted project; `app/admin/page.tsx` renders `panel-admin` + "Todavía no hay reservas cargadas." via `requireAdmin()` → `lib/auth/require-admin.ts` → `getClaims()` → `profiles.role` under RLS |
-| 2 | Nadie que no sea el admin puede entrar al panel de administración | ✓ VERIFIED | `proxy.ts` redirects anonymous `/admin` before render; `requireAdmin()` redirects a signed-in customer to `/login?motivo=sin-acceso`; both paths proven by passing e2e tests (`redirects a signed-in customer...`, `redirects an anonymous request...`) |
-| 3 | La estructura de datos para reservas, pagos y clientes existe y está protegida a nivel de base de datos | ✓ VERIFIED | `supabase/migrations/20260927000002_reservas_pagos_recordatorios.sql` + `20260927000003_comprobantes_privados.sql` pushed and confirmed **Remote**; 23 RLS integration tests (`tests/rls/*.test.ts`) pass, proving cross-customer isolation, no role self-promotion, zero anonymous access, and a private/immutable `comprobantes` bucket |
+| 1 | El admin puede iniciar sesión con su correo y contraseña y llega a un panel de administración vacío | ✓ VERIFIED | `tests/e2e/admin-login.test.ts` + `tests/e2e/admin-access.test.ts` pass (13/13, cold run against the real hosted project); owner confirmed live in UAT item 3 ("Sesión iniciada como gabbovera@gmail.com" shown, logout returns to `/login`) |
+| 2 | Nadie que no sea el admin puede entrar al panel de administración | ✓ VERIFIED | `proxy.ts` (unchanged, re-read in full) redirects anonymous `/admin`; `requireAdmin()` (now unified via `getSessionStatus()`) redirects a signed-in customer to `/login?motivo=sin-acceso`; both proven by passing e2e tests on this cold run |
+| 3 | La estructura de datos para reservas, pagos y clientes existe y está protegida a nivel de base de datos | ✓ VERIFIED | Migrations `20260927000001-4` all confirmed **Remote**; 23 RLS integration tests pass; WR-04's new migration closes the one schema gap the code review found (`tasa_cambio` now enforced NULL-iff-USD in both directions), re-verified: `pagos_tasa_cambio_solo_en_bs` constraint present, `pagos_tasa_cambio_obligatoria_en_bs` dropped |
 
 **Score:** 3/3 ROADMAP success criteria verified.
 
 ### Observable Truths (Plan must_haves, all 4 plans)
 
-All 31 `must_haves.truths` entries across the 4 plans were checked. All 31 are backed by a passing automated test (e2e or db/RLS integration) from the cold, independent run, plus direct code/migration inspection — not presence-only grepping. None are behavior-dependent-but-unverified; every state-transition/isolation claim (session refresh, per-device logout, cross-tenant isolation, role self-promotion, bucket privacy/immutability) is exercised by a real test against the live hosted Supabase project, not simulated.
-
-Representative sample (full list cross-referenced against each plan's frontmatter and each SUMMARY's `coverage:` block):
+All 31 `must_haves.truths` entries across the 4 plans still hold. This re-verification gave full 3-level scrutiny to the 6 truths adjacent to the fixed files (below) and a regression sanity check (existence + one passing test) to the remaining 25, none of which were touched by the fix commits.
 
 | Plan | Truth | Status | Evidence |
 |------|-------|--------|----------|
-| 01-01 | No RLS policy lets a non-admin write `profiles`; trigger never reads role from metadata | ✓ VERIFIED | `grep -ciE "for (insert|update|delete)"` on the migration → 0 (only the admin `FOR ALL` policy exists); `tests/rls/perfiles-rol.test.ts` (5 tests) pass |
-| 01-01 | Secrets live only in `.env.admin.local`, git-ignored, never loaded by the app | ✓ VERIFIED | `git ls-files` shows no `.env.local`/`.env.admin.local`; `grep -rn "SUPABASE_SECRET_KEY\|SUPABASE_ACCESS_TOKEN\|ADMIN_INITIAL_PASSWORD" app lib proxy.ts` → empty |
-| 01-02 | Anonymous `/admin` redirected by root `proxy.ts` before the page renders | ✓ VERIFIED | `proxy.ts` read in full — `getClaims()` called immediately after client creation, redirects to `/login` for `/admin` with no claims; e2e test passes |
-| 01-02 | `cerrarSesion` uses local-scope logout only (D-02) | ✓ VERIFIED | `app/admin/actions.ts`: `scope: 'local'`; `grep -rn "scope: 'global'"` → empty; e2e "logs out only the device that submits form-cerrar-sesion" passed on cold run |
-| 01-02 | Exactly one non-test admin: gabbovera@gmail.com | ✓ VERIFIED | `tests/auth/auth-hardening.test.ts` "es el único admin real" passed on cold run |
-| 01-03 | A VES payment without `tasa_cambio`, and deleting a reserva with a payment, are rejected even for the admin | ✓ VERIFIED | Schema check constraint + `on delete restrict` read directly in the migration; `tests/rls/aislamiento-clientes.test.ts` proves both, even for a service/admin client |
-| 01-03 | `comprobantes` bucket is private, folder-isolated, customer-immutable | ✓ VERIFIED | Migration has no customer UPDATE/DELETE policy on `storage.objects`; `tests/rls/comprobantes.test.ts` (8 tests) passed on cold run, including the public-URL-non-200 and upsert-rejected cases |
-| 01-04 | Wrong password and unknown email produce the identical anti-enumeration message | ✓ VERIFIED | `app/login/actions.ts` maps both to `'Correo o contraseña incorrectos.'`; e2e test passed on the cold run (this is the specific assertion that only failed on the *second*, rate-limited run — see Method) |
-| 01-04 | Root `/` redirects to `/admin` | ✓ VERIFIED | `app/page.tsx` contains `redirect('/admin')`; e2e "la raíz / lleva a /admin" passed |
+| 01-02 | `cerrarSesion` Server Action of the admin panel must call `requireAdmin()` before acting (project invariant) | ✓ VERIFIED | `app/admin/actions.ts` now reads `await requireAdmin();` as its first line (WR-02 fix, commit `4d6d8ce`); e2e "logs out only the device that submits form-cerrar-sesion" still passes on this cold run |
+| 01-02 | Admin-role check logic lives in one place, not duplicated | ✓ VERIFIED | `lib/auth/require-admin.ts` now has a single `cache()`-memoized `getSessionStatus()` returning `{status:'none'|'not-admin'|'admin'}`; both `getAdminSession()` and `requireAdmin()` compose it (WR-03 fix, commit `c5eec24`); read in full, confirmed no re-implementation remains |
+| 01-03 | A VES payment without `tasa_cambio` is rejected; the documented USD-implies-null-rate invariant is also enforced (code review gap closed) | ✓ VERIFIED | New migration `20260927000004_pagos_tasa_cambio_solo_en_bs.sql`, read in full: `check ((moneda='VES' and tasa_cambio is not null) or (moneda='USD' and tasa_cambio is null))`, replacing the one-directional constraint; confirmed applied **Remote**; `npx vitest run --project db` 27/27 including RLS tests |
+| 01-01 | `db:*` scripts load admin secrets safely, without a shell-injection surface | ✓ VERIFIED | `package.json`'s `db:push`/`db:migrations`/`db:types` now call `node scripts/with-admin-env.mjs supabase ...`; `scripts/with-admin-env.mjs` (new) uses `process.loadEnvFile()` (safe key=value parser), never sources the file as shell (WR-05 fix, commit `de7b458`); `npm run db:migrations` re-run in this session succeeded against the live project |
+| 01-01 | Setup scripts fail with a guided message, not a raw crash, when env files are missing | ✓ VERIFIED | `scripts/configure-auth.mjs` and `scripts/seed-admin.mjs` both now wrap `process.loadEnvFile()` in try/catch, mapping `ENOENT` to the existing `fail()` Spanish-message pattern (WR-06 fix, commit `77d6939`); read in full, confirmed present in both files |
+| 01-04 | Login form never shows two contradictory error messages at once | ✓ VERIFIED | `app/login/login-form.tsx`: `mostrarBannerError = Boolean(estado.error) && !errorEmail && !errorPassword` (WR-07 fix, commit `a26ea8f`); read in full, logic confirmed to gate the stale server banner behind "no active field error" |
+| 01-01 | No RLS policy lets a non-admin write `profiles`; trigger never reads role from metadata | ✓ VERIFIED (regression check) | Unchanged since original commit `0a94492`/`25e1db9`; `tests/rls/perfiles-rol.test.ts` still passes on this cold run |
+| 01-02 | Anonymous `/admin` redirected by root `proxy.ts` before the page renders | ✓ VERIFIED (regression check) | `proxy.ts` has zero commits/diff since `9a67732`; e2e test still passes |
+| 01-03 | `comprobantes` bucket is private, folder-isolated, customer-immutable | ✓ VERIFIED (regression check) | Migration `20260927000003` confirmed untouched (single commit, no diff); `tests/rls/comprobantes.test.ts` (8 tests) still passes |
+| 01-04 | Root `/` redirects to `/admin`; wrong password and unknown email produce the identical anti-enumeration message | ✓ VERIFIED (regression check) | `app/page.tsx` and `app/login/actions.ts` unchanged since their original commits; e2e tests still pass |
 
-No must-have across any of the 4 plans failed. No override was needed.
+No must-have across any of the 4 plans failed or regressed. No override was needed for any must-have.
 
 ### Advisory (New Scope, Unevidenced)
 
-Not applicable — this is an initial verification, not a re-verification.
+| # | Finding | Category | Why Advisory |
+|---|---------|----------|---------------|
+| 1 | WR-01 (login credential-validity oracle for non-admin accounts) remains unfixed | security | Deliberately deferred by the project owner to Phase 3 (documented in `ROADMAP.md` Phase 3 Notes and `01-REVIEW-FIX.md`'s skipped-issues section) rather than a gap discovered by this re-verification; a code fix attempt broke the tested two-tier `/login` design and was cleanly rolled back. Per this task's explicit instruction, not re-litigated or re-flagged as a blocking gap — recorded here only for traceability, exactly as it already is in ROADMAP.md. |
 
 ## Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `supabase/migrations/20260927000001_perfiles_y_rol_admin.sql` | profiles + RLS + `private.is_admin()` + trigger | ✓ VERIFIED | Exists, pushed remotely, `enable row level security` ×2, `private.is_admin()` ×8 |
-| `supabase/migrations/20260927000002_reservas_pagos_recordatorios.sql` | reservas/pagos/recordatorios + RLS | ✓ VERIFIED | Exists, pushed remotely, RLS enabled for all 3 tables (confirmed by grep loop) |
-| `supabase/migrations/20260927000003_comprobantes_privados.sql` | private bucket + storage policies | ✓ VERIFIED | Exists, pushed remotely, `'comprobantes'` ×7 |
-| `lib/supabase/server.ts` | server-only Supabase client | ✓ VERIFIED | `import "server-only"` on line 1, used by `require-admin.ts`, `login/actions.ts`, `admin/actions.ts` |
-| `lib/auth/require-admin.ts` | `getAdminSession`/`requireAdmin` | ✓ VERIFIED | Both exported, both call `getClaims()` (2 occurrences), used by `app/admin/page.tsx` and `app/login/page.tsx` |
-| `proxy.ts` | session refresh + optimistic redirect | ✓ VERIFIED | At project root (not `app/`, not `middleware.ts`); `getClaims()` called immediately after client creation |
-| `app/admin/page.tsx` / `app/admin/actions.ts` | guarded panel + local logout | ✓ VERIFIED | `requireAdmin()` called; `form-cerrar-sesion` present; `scope: 'local'` |
-| `app/login/page.tsx` / `login-form.tsx` / `actions.ts` | branded, validated, progressive-enhancement login | ✓ VERIFIED | `esquemaLogin.safeParse` server-side, `zodResolver(esquemaLogin)` client-side, `useActionState` + `action={formAction}` for no-JS fallback |
-| `lib/validation/auth.ts` | shared zod schema | ✓ VERIFIED | `esquemaLogin`, `DatosLogin` exported, consumed by both actions.ts and login-form.tsx |
-| `scripts/seed-admin.mjs` / `scripts/configure-auth.mjs` | real admin + closed signup | ✓ VERIFIED | Idempotent per SUMMARY; `tests/auth/auth-hardening.test.ts` proves the live state (4/4 tests pass) |
-| `lib/database.types.ts` | generated from live schema | ✓ VERIFIED | Contains `reservas` (5), `pagos` (4), `recordatorios` (2), `profiles` (5) |
-| `tests/helpers/fixtures.ts` | shared test fixtures, 10 exports | ✓ VERIFIED | All 10 exports present (`publicClient`, `serviceClient`, `createTestUser`, `cleanupTestUsers`, `sweepStaleTestUsers`, `CookieJar`, `submitForm`, `signInAs`, `createReservaFixture`, `trackStoragePath`) |
-| `tests/rls/*.test.ts` (4 files) | RLS proof suite | ✓ VERIFIED | All 4 files exist, 23 tests, all passed on the cold run |
-| `tests/e2e/*.test.ts` (2 files) + `global-setup.ts` | e2e proof suite | ✓ VERIFIED | 13 e2e tests, all passed on the cold run |
-| `tests/auth/auth-hardening.test.ts` | admin-hardening proof | ✓ VERIFIED | 4 tests, all passed on the cold run |
+| `supabase/migrations/20260927000004_pagos_tasa_cambio_solo_en_bs.sql` | Two-directional `tasa_cambio` NULL-iff-USD constraint | ✓ VERIFIED | New file, applied **Remote**, drops the old one-directional constraint and adds the corrected one |
+| `scripts/with-admin-env.mjs` | Safe env loader + spawn wrapper for `db:*` scripts | ✓ VERIFIED | New file, uses `process.loadEnvFile()`, `spawnSync`, own `fail()` error handling; wired from `package.json` |
+| `app/admin/actions.ts` | `cerrarSesion` guarded by `requireAdmin()` | ✓ VERIFIED | `await requireAdmin();` is the first statement |
+| `lib/auth/require-admin.ts` | Single unified `getSessionStatus()` check | ✓ VERIFIED | `getAdminSession()` and `requireAdmin()` both call it; no duplicated query logic remains |
+| `scripts/configure-auth.mjs` / `scripts/seed-admin.mjs` | Friendly ENOENT handling | ✓ VERIFIED | Both wrap `process.loadEnvFile()` in try/catch → `fail()` |
+| `app/login/login-form.tsx` | No contradictory error banner + field error | ✓ VERIFIED | `mostrarBannerError` gate confirmed |
+| All artifacts from the original (unchanged) verification | — | ✓ VERIFIED (unchanged) | `proxy.ts`, migrations `0001-0003`, `lib/supabase/server.ts`, `app/login/page.tsx`, `lib/validation/auth.ts`, `lib/database.types.ts`, all test files — confirmed zero commits/diff since the initial verification, all still pass |
 
 ## Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|-----|-----|--------|---------|
-| `app/login/login-form.tsx` | `app/login/actions.ts` | `useActionState(iniciarSesion)` + `action={formAction}` | ✓ WIRED | Confirmed in file content read in full |
-| `app/login/actions.ts` | `lib/validation/auth.ts` | `esquemaLogin.safeParse` | ✓ WIRED | Confirmed by grep + read |
-| `app/admin/page.tsx` | `lib/auth/require-admin.ts` | `await requireAdmin()` | ✓ WIRED | Confirmed by read; not orphaned — `app/admin/page.tsx` and `app/login/page.tsx` both import it |
-| `proxy.ts` | Supabase Auth | `createServerClient` → immediate `getClaims()` | ✓ WIRED | No code between client creation and the call, confirmed by reading the file |
-| `supabase/migrations/...0002...sql` | `private.is_admin()` | admin policies call `(select private.is_admin())` | ✓ WIRED | `grep -c "private.is_admin()"` = 7 across that migration |
-| `scripts/seed-admin.mjs` | `public.profiles` | promotes role to admin for `gabbovera@gmail.com` | ✓ WIRED | `tests/auth/auth-hardening.test.ts` confirms the live row |
+| `app/admin/actions.ts` | `lib/auth/require-admin.ts` | `await requireAdmin()` | ✓ WIRED | Confirmed by read |
+| `package.json` (`db:*`) | `scripts/with-admin-env.mjs` | `node scripts/with-admin-env.mjs supabase ...` | ✓ WIRED | Confirmed by read; functionally re-run in this session (`npm run db:migrations` succeeded against the live project) |
+| `lib/auth/require-admin.ts`'s `getAdminSession`/`requireAdmin` | `getSessionStatus()` | direct function call, both compose the same `cache()`-memoized result | ✓ WIRED | Confirmed by read — no independent re-implementation remains |
+| `supabase/migrations/20260927000004...sql` | live hosted Supabase project | `npm run db:push` (already applied per REVIEW-FIX; re-confirmed via `npm run db:migrations` in this session) | ✓ WIRED | `local == remote` for all 4 migrations |
+| All original key links (login-form → actions, actions → validation schema, admin/page → require-admin, proxy → Supabase Auth, migration 0002 → `private.is_admin()`, seed-admin → profiles) | — | — | ✓ WIRED (unchanged) | Files unchanged since original verification; still pass their respective tests |
 
 ## Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |-------------|-------------|--------------|--------|----------|
-| AUTH-01 | 01-01, 01-02, 01-03, 01-04 | El admin puede iniciar sesión como único usuario administrador | ✓ SATISFIED | All 4 plans' must_haves independently verified; REQUIREMENTS.md correctly marks it `[x] Complete`; no other admin account exists besides `gabbovera@gmail.com` (proven live, not just by code review) |
+| AUTH-01 | 01-01, 01-02, 01-03, 01-04 | El admin puede iniciar sesión como único usuario administrador | ✓ SATISFIED | Unchanged — `REQUIREMENTS.md` still marks `[x] Complete`; all 4 plans' must_haves re-verified after the fix pass; only one non-test admin account exists (`gabbovera@gmail.com`), confirmed live via `tests/auth/auth-hardening.test.ts` |
 
-No orphaned requirements — REQUIREMENTS.md maps only AUTH-01 to Phase 1, and all 4 plans declare `requirements: [AUTH-01]`.
+No orphaned requirements.
 
-## Anti-Patterns / Notable Findings
+## Anti-Patterns Found
 
-| File(s) | Finding | Severity | Impact |
-|---------|---------|----------|--------|
-| — | No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any phase-created/modified file | — | None — clean |
-| Supabase Auth rate limiting on back-to-back full-suite runs | Running the full `vitest run` suite twice in quick succession against the same hosted Supabase project trips Supabase's own login rate limiter, causing transient test failures unrelated to application code (confirmed: the failing wrong-password assertion actually received the correctly-mapped "Demasiados intentos..." 429 message, proving the rate-limit-handling code works) | ℹ️ Info | Already flagged by the phase's own FA-1 ("rate-limited login... no automated expiry simulation. Needs human review at verify time"). Worth keeping in mind for CI: back-to-back full runs against the single shared hosted dev/test project can produce spurious red — not a defect to fix in Phase 1, but a fragility to watch as Phase 2+ adds more tests to the same suite. |
-| Root `AGENTS.md`/`CLAUDE.md` regenerated by `next dev` | Present on disk (untracked, gitignored) — expected per 01-01-SUMMARY's documented deviation fix | ℹ️ Info | Confirmed both files are gitignored (`/AGENTS.md`, `/CLAUDE.md` in `.gitignore`) and untracked; `.claude/CLAUDE.md` (the real project-instructions file) is confirmed byte-for-byte unchanged all phase (`git diff --quiet` exits 0; `git log --follow` shows no phase-1 touches) |
-| Worktree isolation disabled (`workflow.use_worktrees: false`, commit `f985e13`) | All 4 plans ran sequentially on `main`, no worktree | ℹ️ Info | Confirmed as an infrastructure decision, not a scope deviation: `.env.local`/`.env.admin.local` are gitignored and exist only in the main checkout, so they are structurally invisible to a worktree. Commit `f985e13` ("chore(01-01): disable git worktree isolation for phase execution") predates all 4 plans' execution commits, and each plan's SUMMARY documents the same rationale consistently. This did not change what was built — every plan's own `<verify>`/acceptance-criteria commands ran and passed regardless of branching strategy, and the git history shows clean, sequential, non-overlapping commits per plan (`01-01` → `01-02`/`01-03` (parallel-safe per `coupling_justified`) → `01-04`) with no lost or conflicting work. |
+| File | Line | Pattern | Severity | Impact |
+|------|------|---------|----------|--------|
+| — | — | No `TBD`/`FIXME`/`XXX`/`TODO`/`HACK`/`PLACEHOLDER` markers found in any of the 6 fixed files or the new files (`scripts/with-admin-env.mjs`, migration `20260927000004`) | — | None — clean |
+| `app/login/actions.ts` | — | WR-01 remains open (see Advisory) — not a code-quality anti-pattern, a deliberately deferred security hardening item with an owner-approved rationale recorded in `ROADMAP.md` | ℹ️ Info | Already tracked; not a Phase 1 blocker per the owner's own scoping decision |
+
+## Behavioral Spot-Checks
+
+| Behavior | Command | Result | Status |
+|----------|---------|--------|--------|
+| Build succeeds end-to-end | `npm run build` | Compiled successfully, 0 TS errors, 4 routes generated | ✓ PASS |
+| DB/RLS test suite | `npx vitest run --project db` | 5 files, 27/27 passed | ✓ PASS |
+| E2E test suite (against existing dev server, no port conflict) | `E2E_BASE_URL=http://localhost:3000 npx vitest run --project e2e` | 2 files, 13/13 passed | ✓ PASS |
+| Migrations applied remotely, `0002`/`0003` untouched | `npm run db:migrations` + `git log --oneline -- <file>` | `local==remote` for `0001-0004`; `0002`/`0003` each have exactly 1 commit, unchanged since Plan 01-03 | ✓ PASS |
 
 ## Human Verification Required
 
-Per `workflow.human_verify_mode: end-of-phase`, this phase deliberately deferred human-check items to end-of-phase UAT instead of halting execution. Harvested from all 4 SUMMARY.md files (none were dropped):
-
-### 1. Modelo de datos para revisar (Plan 01-03)
-
-**Test:** Lee la sección "Modelo de datos para revisar" en `01-03-SUMMARY.md`. Resume: cada cliente es una cuenta creada por el admin (sin registro público); cada reserva tiene precio y moneda (USD por defecto); cada pago guarda método/monto/moneda, y si es en bolívares, la tasa de cambio es obligatoria; una reserva con pagos no se puede borrar; los recordatorios son una cola interna (el cliente se entera por correo en Fase 5); los comprobantes de pago son privados y, una vez subidos, el cliente no puede borrarlos ni reemplazarlos.
-**Expected:** El dueño del negocio confirma que el modelo coincide con cómo opera hoy, o señala qué cambiar antes de que la Fase 2 construya pantallas sobre él. Pregunta explícita del propio plan: **¿habrá clientes que nunca tengan cuenta (sin correo)?** — por ejemplo alguien que paga en efectivo una sola vez y nunca vuelve a usar la app. Si la respuesta es sí, el modelo actual no lo resuelve todavía.
-**Why human:** Ajuste al modelo de negocio (RESEARCH Assumption A2); no es verificable por grep ni por pruebas automatizadas, y cambiarlo después de que la Fase 2 construya sobre él costaría una migración más cambios de código coordinados.
-
-### 2. Visual/marca en pantalla de teléfono (Plan 01-04)
-
-**Test:** Con `npm run dev` corriendo, abre `http://localhost:3000` en una ventana de 375px de ancho (modo dispositivo del navegador) y revisa `/login` y `/admin`.
-**Expected:** El logo y el botón morado (`#482583`) se ven bien en el tamaño de teléfono; los campos y el botón son cómodos de tocar.
-**Why human:** El ajuste visual/de marca no es verificable por grep ni por el test suite automatizado.
-
-### 3. Login real con la cuenta del operador (Plan 01-04)
-
-**Test:** Inicia sesión como `gabbovera@gmail.com` con la contraseña inicial, revisa el panel, presiona "Cerrar sesión", luego intenta iniciar sesión con una contraseña incorrecta.
-**Expected:** El panel muestra "Sesión iniciada como gabbovera@gmail.com"; la contraseña incorrecta muestra "Correo o contraseña incorrectos." en español; cerrar sesión regresa a `/login`.
-**Why human:** Requiere la cuenta real del operador y un navegador real; los tests automatizados usan exclusivamente cuentas desechables `rt-test-`, nunca la cuenta real, por diseño (para no arriesgar la única cuenta admin real).
-
-### 4. Persistencia de sesión al día siguiente — D-01 (Plan 01-04)
-
-**Test:** Reabre el mismo navegador (con la sesión de `gabbovera@gmail.com` ya iniciada) al día siguiente.
-**Expected:** El panel abre sin pedir la contraseña de nuevo — la cookie de sesión de `@supabase/ssr` dura 400 días por defecto, y `proxy.ts` la renueva en cada visita.
-**Why human:** Una expiración/renovación de sesión de un día de diferencia no puede simularse en un test e2e que corre en segundos. El propio 01-01-PLAN.md lo marca explícitamente como sin cobertura automatizada (FA-1: "access-token refresh after expiry: only a static check... plus a next-day human check. There is no automated expiry simulation").
+None. All 4 original human-verification items were resolved by the project owner in `01-UAT.md` (status: complete, 4/4 `aprobado`):
+1. Data model sign-off — approved, with a forward-looking payer-vs-traveler note logged into `PROJECT.md`/`ROADMAP.md` for Phase 2 (not a Phase 1 action item).
+2. Mobile visual/brand check at 375px — approved.
+3. Real login with the operator's account — approved (panel shows correct greeting, wrong password shows the correct Spanish message, logout returns to `/login`).
+4. Next-day session persistence — accepted by owner's informed decision to trust the automated double-verification (session-duration settings confirmed via Management API + `@supabase/ssr`'s 400-day default cookie) rather than waiting a real day; explicitly documented as "not yet live-tested, report back if wrong" rather than falsely closed.
 
 ## Gaps Summary
 
-No gaps. All 3 ROADMAP success criteria and all 31 must-have truths across the 4 plans are verified by a combination of live code inspection, migration content read directly from the repository, and a cold, independent full-suite test run (40/40 passing) against the real hosted Supabase project — not by trusting SUMMARY-reported numbers. `AUTH-01` is correctly marked complete in `REQUIREMENTS.md`; no orphaned requirements exist for Phase 1. The phase's own deferred human-check items (data-model sign-off, visual/brand check, real-account login, and next-day session persistence) were correctly harvested from all 4 SUMMARY.md files and are queued above — none were dropped. The phase goal is achieved pending this human sign-off.
+No gaps. This re-verification confirms:
+- All 6 applied code-review fixes (WR-02 through WR-07) are real, committed, correctly implemented (read in full, not grepped-only), and introduced no regressions — `npm run build`, the db test suite (27/27), and the e2e test suite (13/13) all pass cold against the live hosted Supabase project.
+- WR-04's new migration (`20260927000004`) is applied **Remote** and left the already-applied `20260927000002`/`20260927000003` migrations untouched (single commit each, zero diff since Plan 01-03).
+- The one deliberately-skipped finding, WR-01, was cleanly rolled back (zero diff on `app/login/actions.ts` since its original commit) and is recorded as an owner-approved deferral to Phase 3, not re-litigated here per this task's explicit scope.
+- All 31 must-have truths across the 4 plans still hold; the 6 adjacent to the fixed files were re-verified at full depth, the remaining 25 (all in unchanged files) passed a regression check.
+- All 4 original human-verification items are resolved by the owner in `01-UAT.md`.
+
+The phase goal — a protected database with per-role RLS and a working admin login — is achieved. Status moves from `human_needed` to `passed`.
 
 ---
 
-*Verified: 2026-09-28*
+*Verified: 2026-09-28T14:10:00Z*
 *Verifier: Claude (gsd-verifier)*
