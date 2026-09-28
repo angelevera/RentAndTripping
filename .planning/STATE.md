@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 01
 current_phase_name: Base y acceso seguro
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-09-28T16:13:32.124Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-09-28T16:26:31.931Z"
 last_activity: 2026-09-28
 last_activity_desc: Phase 01 execution started
-state_head: 1d55d98a87273a450516c3d38eff07ea5411df1b
+state_head: 9fbd0e798d9abb52f4038e80e25094b4fd2ebcea
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 ## Current Position
 
 Phase: 01 (Base y acceso seguro) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-09-28 — Phase 01 execution started
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 55min | 3 tasks | 10 files |
+| Phase 01 P02 | 45min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Single hosted Supabase project for dev + automated tests, namespaced rt-test- fixtures with 30-min sweep (FA-4)
 - [Phase 01]: shadcn/ui init deferred to Phase 2 UI contract; Task 3 login/admin markup uses plain Tailwind for now
 - [Phase 01]: Worktree isolation disabled project-wide because gitignored Supabase secrets are not visible inside an isolated worktree
+- [Phase 01]: requireAdmin()/getAdminSession() re-verify claims and profiles.role independently on every call rather than trusting proxy.ts's redirect — the proxy is UX only, RLS + page guard are the real boundary
+- [Phase 01]: No custom session-duration, single-session, or forced-logout code added anywhere — D-01/D-02 come entirely from @supabase/ssr and Supabase Auth defaults, verified by npm run auth:configure
+- [Phase 01]: Auth-hardening test for signUp rejection asserts error.code === 'signup_disabled' specifically, not just any error, after discovering an unrelated email rate-limit error could produce a false-positive RED
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-28T16:13:32.115Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-09-28T16:26:31.922Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
