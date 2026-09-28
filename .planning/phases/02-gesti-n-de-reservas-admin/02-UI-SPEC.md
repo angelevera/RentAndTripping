@@ -13,7 +13,11 @@ created: "2026-09-28"
 
 Cubre las pantallas nuevas de esta fase: la lista de reservas (`/admin`, reemplaza el placeholder de Fase 1), el formulario de crear/editar reserva (`/admin/reservas/nueva` y `/admin/reservas/[id]/editar`), la barra de filtros/búsqueda sobre la lista, y las insignias (badges) de estado proveedor/pago. No cubre pantallas de cliente (Fase 3) ni de pago/comprobantes (Fase 4).
 
-**Dispositivo:** ni CONTEXT.md ni el roadmap fijan un dispositivo específico para el admin de esta fase (a diferencia del mandato mobile-first del proyecto, que habla de los *clientes*). Este documento asume **mobile-first también para el admin** por defecto — el operador ya entra hoy desde el celular a Instagram/WhatsApp para gestionar todo — con un diseño que se adapta bien a pantallas grandes cuando las use. Esto es un valor por defecto razonable, no una decisión confirmada por el usuario; si el admin trabaja principalmente desde escritorio, vale la pena confirmarlo antes de construir.
+**Dispositivo [Confirmado]:** el admin usa más el celular, pero también tiene acceso a computadora. Diseño **mobile-first**, con la vista de escritorio funcionando igual de bien — en particular el formulario de crear reserva, que debe aprovechar la pantalla grande cuando el admin la tenga a mano (más espacio para llenar los campos sin sentirse apretado, aunque el layout base siga siendo el mismo de móvil, no uno rediseñado desde cero para escritorio).
+
+**Puntos focales por pantalla [Confirmado]:**
+- **Lista de reservas:** el punto focal es el **estado** — proveedor y, sobre todo, si el pago está pendiente. Las insignias de estado (badge) deben ser lo primero que el ojo capta en cada fila/tarjeta, antes que cualquier otro dato (cliente, tipo, monto). En la vista de tabla de escritorio esto sugiere columnas de estado con buen contraste visual y posición temprana; en la vista de tarjeta móvil, las insignias van en una posición prominente (no al final de la tarjeta).
+- **Formulario de crear/editar reserva:** el punto focal es que se pueda **completar rápido, sin distracciones** — jerarquía simple, un campo lleva al siguiente sin elementos secundarios compitiendo por atención (nada de contenido promocional, ayuda extensa visible por defecto, o secciones colapsables innecesarias). El botón "Crear reserva"/"Guardar cambios" es el cierre natural del flujo, no el elemento que compite con los campos por atención mientras se llena el formulario.
 
 ---
 
@@ -214,7 +218,7 @@ Exceptions: **44px mínimo** para todo objetivo táctil (botones, inputs, contro
 > Empty-state and error-state COPY live in `## Copywriting Contract` above — this section covers
 > state coverage and REFERENCES those rows rather than restating the copy (de-dup).
 
-Applicable state considerations resolved: 12 covered, 0 backstop, 1 unresolved.
+Applicable state considerations resolved: 13 covered, 0 backstop, 0 unresolved.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
@@ -223,7 +227,7 @@ Applicable state considerations resolved: 12 covered, 0 backstop, 1 unresolved.
 | error | Lista de reservas (list-collection) | ✅ covered | Ver fila "Error state (falla al cargar la lista)" del Copywriting Contract. |
 | populated | Lista de reservas (list-collection) | ✅ covered | Tabla (`Table`) en ≥640px; tarjetas apiladas (`Card`) en <640px. Columnas D-08, orden por creación descendente (D-11), sin control de orden en la UI (el orden es fijo). |
 | partial | Lista de reservas (list-collection) | ✅ covered | `fecha_importante` ausente (D-07 es opcional) se muestra como "—" en su columna; el monto nunca falta porque el precio es obligatorio al crear. |
-| overflow | Lista de reservas (list-collection) | ⚠ unresolved | Tamaño de página no confirmado por el usuario — se asume paginación de 20 en 20 con "Anterior"/"Siguiente" como valor por defecto razonable dado el volumen (10-15 reservas/semana, ver `idea.md`); el planner debe tratarlo como supuesto a confirmar, no como requisito cerrado. Nombre de cliente largo: se trunca con "…" solo en la vista de tabla de escritorio (columnas angostas); en la vista de tarjeta móvil se muestra completo (hay espacio de sobra). |
+| overflow | Lista de reservas (list-collection) | ✅ covered | Tamaño de página **[Confirmado]:** 20 reservas por página, con "Anterior"/"Siguiente". Nombre de cliente largo: se trunca con "…" solo en la vista de tabla de escritorio (columnas angostas); en la vista de tarjeta móvil se muestra completo (hay espacio de sobra). |
 | zero-one-many | Lista de reservas (list-collection) | ✅ covered | El título de página es fijo ("Reservas"), sin variación singular/plural; una sola fila se ve igual que muchas, sin mensaje especial para el caso de una. |
 | empty | Formulario de reserva (form) | ✅ covered | Crear: todos los campos inician vacíos, salvo "Tipo de reserva" preseleccionado en "Pasaje aéreo" (la opción más común). Editar: se precargan los valores guardados, incluido el estado proveedor. |
 | loading | Formulario de reserva (form) | ✅ covered | El botón de guardar cambia a "Guardando…" y se deshabilita durante el envío — mismo patrón que "Entrando…" en `login-form.tsx`. |
@@ -253,12 +257,12 @@ No se declaró ningún registro de terceros para esta fase — no aplica vetting
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS (FLAG inicial del checker — puntos focales no declarados — resuelto arriba con la confirmación del usuario)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: FLAG no bloqueante (ambigüedad "2 pesos por familia" vs. total — el spec ya cumple la interpretación por familia; el checker lo dejó como aclaración, no como bloqueo)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS con nota — shadcn/ui no estaba inicializado al momento de la investigación; re-enumerar con `npx shadcn info` después de correr el comando de instalación de esta fase
 
-**Approval:** pending
+**Approval:** approved (gsd-ui-checker, 2026-09-28) — sin bloqueantes. Los dos FLAGs no bloqueantes (Dimension 4 y 7) son aclaraciones para el ejecutor, no defectos del contrato.
