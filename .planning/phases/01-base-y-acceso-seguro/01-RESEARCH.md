@@ -661,19 +661,19 @@ where id = (select id from auth.users where email = 'gabbovera@gmail.com');
 
 **If this table is empty:** N/A — see items above; none of them block starting Phase 1, but A2 in particular should get a lightweight human nod before Phase 2 locks in on top of it.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should the Supabase Auth "Time-box user sessions" / "Single session per user" dashboard settings be explicitly verified as disabled, rather than just assumed default?**
+1. **(RESOLVED)** Should the Supabase Auth "Time-box user sessions" / "Single session per user" dashboard settings be explicitly verified as disabled, rather than just assumed default?
    - What we know: Both are off/unset by default per Supabase's own session docs.
    - What's unclear: Whether the actual Supabase project (once created) could have inherited a non-default org-level setting.
-   - Recommendation: Add a one-line manual check to the phase's verification steps — open Auth settings > Sessions in the dashboard and confirm both are at their default/disabled state — rather than skip verifying a load-bearing assumption for D-01/D-02.
+   - Resolution: Plan 01-02 Task 2 (`npm run auth:configure`) checks and, if needed, patches these session settings through the Management API as part of admin account setup — not left as a manual dashboard check.
 
-2. **Single Supabase project for dev+prod, or a separate dev/staging project?**
+2. **(RESOLVED)** Single Supabase project for dev+prod, or a separate dev/staging project?
    - What we know: `research/ARCHITECTURE.md` sizes the whole system for ~10-15 bookings/week with one admin, which doesn't obviously require environment separation.
    - What's unclear: CONTEXT.md doesn't address this, and RLS integration testing (this phase's own Validation Architecture) will insert test fixtures somewhere.
-   - Recommendation: single project for the MVP is consistent with the project's stated priorities (cheap, low-maintenance) — but the RLS test suite should clearly namespace or clean up its seeded test users/rows so they don't show up as "phantom" reservations to the real admin later.
+   - Resolution: Single hosted project for the MVP (Plan 01-01 Task 2), with test fixtures namespaced `rt-test-` and cleaned up (a stale-fixture sweep) so they never appear as "phantom" reservations to the real admin. Recorded as flagged assumption FA-4 in 01-01-PLAN.md.
 
-3. **Exact patch versions will drift.** All versions in this document were confirmed against the live npm registry on 2026-09-27 — re-run `npm view <pkg> version` at actual scaffold time.
+3. **(NOTED, not blocking)** Exact patch versions will drift. All versions in this document were confirmed against the live npm registry on 2026-09-27 — re-run `npm view <pkg> version` at actual scaffold time (Plan 01-01 Task 2 scaffolds the project, so this check happens naturally then).
 
 ## Environment Availability
 
