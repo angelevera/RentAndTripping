@@ -29,10 +29,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. El admin puede iniciar sesión con su correo y contraseña y llega a un panel de administración (aunque todavía esté vacío, sin reservas cargadas).
   2. Nadie que no sea el admin puede entrar al panel de administración.
   3. La estructura de datos para reservas, pagos y clientes ya existe y está protegida a nivel de base de datos (no solo escondida en la pantalla), lista para que las próximas fases construyan sobre ella con confianza.
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Esqueleto andante: paquetes aprobados, proyecto enlazado a Supabase, y el admin entra por /login y llega a /admin (tracer)
+- [ ] 01-02-PLAN.md — Solo el admin entra y se queda conectado: proxy, guardia, cierre de sesión por dispositivo, cuenta real gabbovera@gmail.com, registro público cerrado
+- [ ] 01-03-PLAN.md — Reservas, pagos, recordatorios y comprobantes privados protegidos con RLS y probados
+- [ ] 01-04-PLAN.md — Entrada con la marca y formulario validado en español (funciona sin JavaScript)
 
 ### Phase 2: Gestión de reservas (admin)
 **Goal**: El admin tiene un solo lugar para crear, editar y dar seguimiento a todas las reservas (pasajes, hoteles, tours, entradas), reemplazando el cuaderno mental/WhatsApp de hoy.
@@ -102,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Base y acceso seguro | 0/TBD | Not started | - |
+| 1. Base y acceso seguro | 0/4 | Planned | - |
 | 2. Gestión de reservas (admin) | 0/TBD | Not started | - |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
