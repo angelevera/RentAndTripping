@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:db": "vitest run --project db",
     "test:e2e": "vitest run --project e2e",
-    "db:push": "set -a && . ./.env.admin.local && set +a && supabase db push --linked --password \"$SUPABASE_DB_PASSWORD\" --yes",
-    "db:migrations": "set -a && . ./.env.admin.local && set +a && supabase migration list --linked --password \"$SUPABASE_DB_PASSWORD\"",
-    "db:types": "set -a && . ./.env.admin.local && set +a && supabase gen types typescript --linked > lib/database.types.ts",
+    "db:push": "node scripts/with-admin-env.mjs supabase db push --linked --yes",
+    "db:migrations": "node scripts/with-admin-env.mjs supabase migration list --linked",
+    "db:types": "node scripts/with-admin-env.mjs supabase gen types typescript --linked > lib/database.types.ts",
     "seed:admin": "node scripts/seed-admin.mjs",
     "auth:configure": "node scripts/configure-auth.mjs"
   },
