@@ -3,17 +3,17 @@ status: testing
 phase: 01-base-y-acceso-seguro
 source: [01-VERIFICATION.md]
 started: 2026-09-28T13:00:00Z
-updated: 2026-09-28T13:00:00Z
+updated: 2026-09-28T13:15:00Z
 ---
 
 ## Current Test
 
-number: 1
-name: Modelo de datos para revisar (Plan 01-03)
+number: 2
+name: Visual/marca en pantalla de teléfono (375px) (Plan 01-04)
 expected: |
-  El dueño confirma que el modelo de datos (reservas/pagos/recordatorios) coincide con cómo
-  funciona el negocio, o señala qué cambiar antes de que la Fase 2 construya pantallas sobre él.
-  Pregunta clave: ¿habrá clientes que nunca tengan cuenta (sin correo)?
+  Con `npm run dev` corriendo, abre http://localhost:3000 en una ventana de 375px de ancho
+  (modo dispositivo del navegador). El logo y el botón morado (#482583) se ven bien en ese
+  tamaño; el diseño es de una sola columna, cómodo de tocar con el dedo.
 awaiting: user response
 
 ## Tests
@@ -27,7 +27,15 @@ expected: |
   correo en la Fase 5). Los comprobantes de pago son privados e inmutables para el cliente una
   vez subidos.
   Pregunta abierta: ¿habrá clientes que nunca tengan cuenta (sin correo)?
-result: [pending]
+result: aprobado, con nota de diseño para Fase 2 (no se cambia nada en Fase 1)
+notes: |
+  Sí, habrá clientes sin cuenta y sin correo. Además, quien paga no siempre es quien viaja:
+  una reserva debe distinguir al pagador (puede tener cuenta) del viajero (puede no tenerla).
+  Más adelante el pagador podrá ver y gestionar las reservas de sus familiares — esa
+  funcionalidad se decide como alcance en Fase 3, pero el modelo de datos de Fase 2 debe
+  permitirla. Registrado en PROJECT.md → Key Decisions y en ROADMAP.md → Fase 2/Fase 3 →
+  Notes, para que /gsd-discuss-phase 2 y su plan lo incluyan como una migración NUEVA
+  (no se edita el esquema de reservas/pagos ya aplicado en Fase 1).
 
 ### 2. Visual/marca en pantalla de teléfono (375px) (Plan 01-04)
 expected: |
@@ -54,5 +62,5 @@ result: [pending]
 ## Summary
 
 total: 4
-passed: 0
+passed: 1
 issues: 0

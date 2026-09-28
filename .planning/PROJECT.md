@@ -64,6 +64,7 @@ Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar
 | Confirmación de pagos manual en todos los métodos | Sin acceso a webhooks automáticos de Zelle/Binance/Payoneer en esta etapa | — Pending |
 | Color de marca `#482583`, tipografía Poppins/Fredoka (títulos) + Inter (cuerpo) | Extraído directamente del logo oficial; no existe la fuente original | ✓ Good |
 | Fotografía de stock (Unsplash/Pexels) en vez de fotos propias | El negocio no tiene banco de fotos propio todavía | — Pending |
+| Una reserva distingue al pagador (quien paga, puede tener cuenta) del viajero (quien viaja, puede no tener cuenta ni correo) | Confirmado en el UAT de Fase 1: habrá clientes sin cuenta/correo, y quien paga no siempre es quien viaja | — Pending. Se implementa en Fase 2 como **migración nueva** (no se edita el esquema de reservas/pagos ya aplicado en Fase 1). La gestión de reservas de familiares por el pagador es una decisión de **alcance de Fase 3**, pero el modelo de datos de Fase 2 debe permitirla |
 
 ## Evolution
 

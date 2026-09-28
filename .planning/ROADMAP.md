@@ -63,6 +63,10 @@ Plans:
   3. El admin puede ver la lista completa de reservas con su estado (pendiente / confirmada con proveedor / con problema) sin tener que buscar en el chat de WhatsApp.
   4. El admin puede marcar una reserva como "confirmada con el proveedor" de forma independiente a si ya fue pagada o no.
 
+**Notes:**
+- **Pagador vs. viajero** (confirmado en el UAT de Fase 1, 2026-09-28): quien paga una reserva no siempre es quien viaja. El pagador puede tener cuenta; el viajero puede no tenerla y no tener correo. El modelo de datos de esta fase debe distinguir ambos roles en `reservas`. Esto se implementa como una **migración nueva** (siguiente número de timestamp) — no se edita `20260927000002_reservas_pagos_recordatorios.sql` ni `20260927000003_comprobantes_privados.sql`, ya aplicadas en Fase 1. Ver PROJECT.md → Key Decisions.
+- Este cambio de esquema habilita, pero no implementa, la gestión de reservas de familiares por el pagador — esa funcionalidad es una decisión de alcance de **Fase 3** (ver su nota abajo).
+
 **Plans**: TBD
 
 Plans:
@@ -81,6 +85,9 @@ Plans:
   1. El cliente puede iniciar sesión con una cuenta creada/invitada por el admin y ver únicamente sus propias reservas, nunca las de otro cliente.
   2. El cliente puede ver el detalle de cada una de sus reservas: tipo, fecha, estado y precio.
   3. Tanto el cliente como el admin pueden ver el historial de reservas pasadas de ese cliente.
+
+**Notes:**
+- **Decisión de alcance pendiente** (ver Fase 2 → Notes, confirmado en el UAT de Fase 1): ¿puede el pagador ver y gestionar las reservas de sus familiares (viajeros sin cuenta propia)? El modelo de datos de Fase 2 lo permite; si esta fase decide construirlo, úsese `/gsd-discuss-phase 3` para fijar el alcance antes de planear.
 
 **Plans**: TBD
 
