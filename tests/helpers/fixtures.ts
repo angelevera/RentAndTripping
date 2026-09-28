@@ -50,6 +50,10 @@ export function serviceClient() {
 }
 
 const trackedUserIds = new Set<string>();
+const trackedReservaIds = new Set<string>();
+const trackedPagoIds = new Set<string>();
+const trackedRecordatorioIds = new Set<string>();
+const trackedStoragePaths = new Set<string>();
 
 export interface TestUser {
   id: string;
@@ -98,10 +102,136 @@ export async function createTestUser(role: "admin" | "customer"): Promise<TestUs
 }
 
 /**
- * Elimina todos los usuarios de prueba creados por este proceso.
+ * Inicia sesión como el usuario de prueba dado, devolviendo un publicClient
+ * ya autenticado (igual que el que usaría la app real).
+ */
+export async function signInAs(user: TestUser) {
+  const client = publicClient();
+  const { error } = await client.auth.signInWithPassword({
+    email: user.email,
+    password: user.password,
+  });
+  if (error) {
+    throw new Error(`No se pudo iniciar sesión como ${user.email}: ${error.message}`);
+  }
+  return client;
+}
+
+interface ReservaFixtureParams {
+  clienteId: string;
+  adminId: string;
+}
+
+interface ReservaFixture {
+  reservaId: string;
+  pagoId: string;
+  recordatorioId: string;
+}
+
+/**
+ * Crea, con serviceClient, una reserva (tipo 'tour', 100 USD) con un pago
+ * (100 USD, zelle) y un recordatorio (programado para mañana). Registra los
+ * tres ids para que cleanupTestUsers/sweepStaleTestUsers los borren en el
+ * orden correcto (pagos restringe el borrado de reservas).
+ */
+export async function createReservaFixture({
+  clienteId,
+  adminId,
+}: ReservaFixtureParams): Promise<ReservaFixture> {
+  const admin = serviceClient();
+
+  const { data: reserva, error: reservaError } = await admin
+    .from("reservas")
+    .insert({
+      cliente_id: clienteId,
+      tipo: "tour",
+      precio: 100,
+      moneda: "USD",
+      created_by: adminId,
+    })
+    .select("id")
+    .single();
+  if (reservaError || !reserva) {
+    throw new Error(`No se pudo crear la reserva de prueba: ${reservaError?.message}`);
+  }
+  trackedReservaIds.add(reserva.id);
+
+  const { data: pago, error: pagoError } = await admin
+    .from("pagos")
+    .insert({
+      reserva_id: reserva.id,
+      monto: 100,
+      moneda: "USD",
+      metodo: "zelle",
+      created_by: adminId,
+    })
+    .select("id")
+    .single();
+  if (pagoError || !pago) {
+    throw new Error(`No se pudo crear el pago de prueba: ${pagoError?.message}`);
+  }
+  trackedPagoIds.add(pago.id);
+
+  const fechaEnvioProgramada = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const { data: recordatorio, error: recordatorioError } = await admin
+    .from("recordatorios")
+    .insert({
+      reserva_id: reserva.id,
+      tipo: "recordatorio",
+      fecha_envio_programada: fechaEnvioProgramada,
+    })
+    .select("id")
+    .single();
+  if (recordatorioError || !recordatorio) {
+    throw new Error(`No se pudo crear el recordatorio de prueba: ${recordatorioError?.message}`);
+  }
+  trackedRecordatorioIds.add(recordatorio.id);
+
+  return { reservaId: reserva.id, pagoId: pago.id, recordatorioId: recordatorio.id };
+}
+
+/**
+ * Registra una ruta del bucket comprobantes para que cleanupTestUsers la
+ * elimine, exista o no realmente (una subida rechazada por RLS nunca llega a
+ * crear el objeto, y removerla es un no-op inofensivo).
+ */
+export function trackStoragePath(path: string): void {
+  trackedStoragePaths.add(path);
+}
+
+/**
+ * Elimina todos los usuarios de prueba creados por este proceso, y todo lo
+ * que dependa de ellos primero: comprobantes rastreados, luego recordatorios,
+ * luego pagos, luego reservas (pagos restringe el borrado de reservas, así
+ * que el orden importa), y solo entonces los usuarios.
  */
 export async function cleanupTestUsers(): Promise<void> {
   const admin = serviceClient();
+
+  if (trackedStoragePaths.size > 0) {
+    const paths = Array.from(trackedStoragePaths);
+    await admin.storage.from("comprobantes").remove(paths);
+    trackedStoragePaths.clear();
+  }
+
+  if (trackedRecordatorioIds.size > 0) {
+    const ids = Array.from(trackedRecordatorioIds);
+    await admin.from("recordatorios").delete().in("id", ids);
+    trackedRecordatorioIds.clear();
+  }
+
+  if (trackedPagoIds.size > 0) {
+    const ids = Array.from(trackedPagoIds);
+    await admin.from("pagos").delete().in("id", ids);
+    trackedPagoIds.clear();
+  }
+
+  if (trackedReservaIds.size > 0) {
+    const ids = Array.from(trackedReservaIds);
+    await admin.from("reservas").delete().in("id", ids);
+    trackedReservaIds.clear();
+  }
+
   const ids = Array.from(trackedUserIds);
   for (const id of ids) {
     const { error } = await admin.auth.admin.deleteUser(id);
@@ -114,13 +244,17 @@ export async function cleanupTestUsers(): Promise<void> {
 /**
  * Barre cuentas de prueba (rt-test-...) huérfanas de ejecuciones previas,
  * pero nunca borra una con menos de 30 minutos de creada — una corrida
- * paralela puede estar a mitad de camino.
+ * paralela puede estar a mitad de camino. Antes de borrar cada cuenta,
+ * limpia lo que dependa de ella (comprobantes, recordatorios, pagos,
+ * reservas cuyo cliente_id o created_by sea esa cuenta), en el mismo orden
+ * que cleanupTestUsers, porque pagos restringe el borrado de reservas.
  */
 export async function sweepStaleTestUsers(): Promise<void> {
   const admin = serviceClient();
   const staleBefore = Date.now() - 30 * 60 * 1000;
   let page = 1;
   const perPage = 200;
+  const staleUserIds: string[] = [];
 
   while (true) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
@@ -135,13 +269,49 @@ export async function sweepStaleTestUsers(): Promise<void> {
       if (!user.email?.startsWith("rt-test-")) continue;
       const createdAt = new Date(user.created_at).getTime();
       if (createdAt < staleBefore) {
-        await admin.auth.admin.deleteUser(user.id);
+        staleUserIds.push(user.id);
       }
     }
     if (users.length < perPage) {
       break;
     }
     page += 1;
+  }
+
+  if (staleUserIds.length === 0) {
+    return;
+  }
+
+  for (const uid of staleUserIds) {
+    const { data: files } = await admin.storage.from("comprobantes").list(uid);
+    if (files && files.length > 0) {
+      await admin.storage.from("comprobantes").remove(files.map((f) => `${uid}/${f.name}`));
+    }
+  }
+
+  const { data: reservasPorCliente } = await admin
+    .from("reservas")
+    .select("id")
+    .in("cliente_id", staleUserIds);
+  const { data: reservasPorCreador } = await admin
+    .from("reservas")
+    .select("id")
+    .in("created_by", staleUserIds);
+  const reservaIds = Array.from(
+    new Set([
+      ...(reservasPorCliente ?? []).map((r) => r.id),
+      ...(reservasPorCreador ?? []).map((r) => r.id),
+    ]),
+  );
+
+  if (reservaIds.length > 0) {
+    await admin.from("recordatorios").delete().in("reserva_id", reservaIds);
+    await admin.from("pagos").delete().in("reserva_id", reservaIds);
+    await admin.from("reservas").delete().in("id", reservaIds);
+  }
+
+  for (const uid of staleUserIds) {
+    await admin.auth.admin.deleteUser(uid);
   }
 }
 
