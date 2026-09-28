@@ -1,0 +1,4 @@
+# Secrets — never commit these. Populated manually per Phase 1 setup instructions.
+.env.local
+.env.admin.local
+.env*.local
