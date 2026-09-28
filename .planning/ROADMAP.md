@@ -88,6 +88,7 @@ Plans:
 
 **Notes:**
 - **Decisión de alcance pendiente** (ver Fase 2 → Notes, confirmado en el UAT de Fase 1): ¿puede el pagador ver y gestionar las reservas de sus familiares (viajeros sin cuenta propia)? El modelo de datos de Fase 2 lo permite; si esta fase decide construirlo, úsese `/gsd-discuss-phase 3` para fijar el alcance antes de planear.
+- **Deuda pendiente de la revisión de código de Fase 1 (WR-01, 2026-09-28):** hoy `/login` revela si una contraseña es correcta aunque la cuenta no sea admin (mensaje distinto al de "correo/contraseña incorrectos"). El riesgo es bajo hoy (una sola cuenta admin, registro público cerrado), pero se vuelve relevante cuando esta fase agregue cuentas de cliente reales al mismo `/login` compartido. Diseñar el arreglo junto con el flujo de login del cliente, no antes — el intento de arreglarlo en Fase 1 rompió la prueba que confirma que `/login` es la puerta de entrada compartida. Ver `01-REVIEW.md`/`01-REVIEW-FIX.md` en la carpeta de Fase 1 para el detalle técnico.
 
 **Plans**: TBD
 
