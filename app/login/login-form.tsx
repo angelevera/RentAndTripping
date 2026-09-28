@@ -31,6 +31,15 @@ export function LoginForm() {
   const errorEmail = form.formState.errors.email?.message ?? estado.errores?.email;
   const errorPassword = form.formState.errors.password?.message ?? estado.errores?.password;
 
+  // El banner de error del servidor (ej. "Correo o contraseña incorrectos")
+  // solo se mantiene vigente mientras ningún campo tenga un error de
+  // validación propio. Si el usuario edita un campo y la validación del
+  // cliente falla (ej. borra el correo), form.handleSubmit corta el envío
+  // antes de llamar a formAction, así que estado.error nunca se actualiza;
+  // sin este chequeo, el banner viejo seguiría mostrándose a la vez que el
+  // nuevo error de campo, dando dos explicaciones contradictorias.
+  const mostrarBannerError = Boolean(estado.error) && !errorEmail && !errorPassword;
+
   return (
     <form
       data-testid="form-login"
@@ -39,7 +48,7 @@ export function LoginForm() {
       onSubmit={onSubmit}
       className="mx-auto flex w-full max-w-sm flex-col gap-4"
     >
-      {estado.error && (
+      {mostrarBannerError && (
         <p
           role="alert"
           className="rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700"
