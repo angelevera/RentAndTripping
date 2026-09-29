@@ -14,7 +14,7 @@ Requisitos para el lanzamiento inicial (MVP). Cada uno se mapea a una fase del r
 
 ### Reservas (RESA)
 
-- [ ] **RESA-01**: El admin puede crear una reserva (tipo: pasaje/hotel/tour/entrada, cliente, detalles del servicio, precio, moneda)
+- [x] **RESA-01**: El admin puede crear una reserva (tipo: pasaje/hotel/tour/entrada, cliente, detalles del servicio, precio, moneda)
 - [ ] **RESA-02**: El admin puede editar una reserva existente
 - [x] **RESA-03**: El admin puede ver la lista de todas las reservas con su estado (pendiente / confirmada con proveedor / con problema)
 - [ ] **RESA-04**: El admin puede marcar una reserva como "confirmada con el proveedor" (independiente del estado de pago)
@@ -75,7 +75,7 @@ Exclusiones permanentes (no solo pospuestas), con su razón.
 |-------------|-------|--------|
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 3 | Pending |
-| RESA-01 | Phase 2 | Pending |
+| RESA-01 | Phase 2 | Complete |
 | RESA-02 | Phase 2 | Pending |
 | RESA-03 | Phase 2 | Complete |
 | RESA-04 | Phase 2 | Pending |
