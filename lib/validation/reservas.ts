@@ -35,7 +35,8 @@ const fecha = z.iso.date({ error: "Escribe una fecha válida." });
 
 const cantidadPersonas = z.preprocess(
   (valor) => valor === "" || valor == null ? 1 : valor,
-  z.coerce.number().int({ message: "Escribe cuántas personas viajan (de 1 a 50)." })
+  z.coerce.number({ error: "Escribe cuántas personas viajan (de 1 a 50)." })
+    .int({ message: "Escribe cuántas personas viajan (de 1 a 50)." })
     .min(1, { message: "Escribe cuántas personas viajan (de 1 a 50)." })
     .max(50, { message: "Escribe cuántas personas viajan (de 1 a 50)." }),
 );
@@ -107,7 +108,8 @@ const esquemaReservaBase = z.object({
   // z.coerce.number() establezca el valor de dominio.
   precio: z.preprocess(
     (valor) => String(valor ?? "").replace(",", "."),
-    z.coerce.number().positive({ message: "El precio tiene que ser mayor a cero." })
+    z.coerce.number({ error: "El precio tiene que ser mayor a cero." })
+      .positive({ message: "El precio tiene que ser mayor a cero." })
       .max(10_000_000, { message: "El precio es demasiado alto. Revísalo." }),
   ),
   moneda: z.enum(MONEDAS).default("USD"),

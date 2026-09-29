@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
@@ -18,7 +18,6 @@ export function AvisoToast() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const mostrado = useRef(false);
 
   const aviso = searchParams.get("aviso");
 
@@ -27,11 +26,17 @@ export function AvisoToast() {
 
     if (!(aviso in AVISOS)) return;
 
-    // La ref evita un segundo toast por el doble efecto de desarrollo
-    // (React Strict Mode) — sin ella se mostraría duplicado en `next dev`.
-    if (mostrado.current) return;
-    mostrado.current = true;
-
+    // Sin ref de "ya mostrado": este componente vive en el layout raíz y
+    // persiste entre navegaciones del cliente durante toda la sesión de la
+    // pestaña, así que una ref que solo se pone en true nunca se vuelve a
+    // resetear — el primer aviso se ve y todos los siguientes (crear otra
+    // reserva, guardar otra edición) quedan silenciados para siempre. En
+    // producción, React ejecuta este efecto exactamente una vez por cada
+    // valor de `aviso` realmente nuevo (el propio `router.replace` de abajo
+    // limpia el query param antes de que pueda llegar un valor repetido). El
+    // único costo es un toast duplicado en `next dev` por el doble-invoke de
+    // React Strict Mode (no ocurre en producción) — preferible a que el aviso
+    // real deje de mostrarse después del primero.
     // SAFETY: la línea anterior (`aviso in AVISOS`) ya probó que `aviso` es
     // una de las cuatro claves literales de AVISOS, algo que el compilador
     // no puede inferir solo del `in` sobre un string proveniente de la URL.
