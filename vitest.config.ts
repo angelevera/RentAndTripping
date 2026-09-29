@@ -34,6 +34,13 @@ export default defineConfig({
           hookTimeout: 180000,
         },
       },
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: ["tests/validation/**/*.test.ts"],
+        },
+      },
     ],
   },
   resolve: {

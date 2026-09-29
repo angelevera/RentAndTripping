@@ -29,37 +29,60 @@ export function etiquetaDesde<T extends Record<string, string>>(mapa: T, valor: 
   return mapa[valor as keyof T] ?? valor;
 }
 
+const texto = (max: number) => z.string().trim().max(max, { message: `Máximo ${max} caracteres.` });
+
+const fecha = z.iso.date({ error: "Escribe una fecha válida." });
+
+const cantidadPersonas = z.preprocess(
+  (valor) => valor === "" || valor == null ? 1 : valor,
+  z.coerce.number().int({ message: "Escribe cuántas personas viajan (de 1 a 50)." })
+    .min(1, { message: "Escribe cuántas personas viajan (de 1 a 50)." })
+    .max(50, { message: "Escribe cuántas personas viajan (de 1 a 50)." }),
+);
+
+const viajeros = z.preprocess(
+  (valor) => Array.isArray(valor) ? valor : String(valor ?? "").split(/\r?\n/).map((nombre) => nombre.trim()).filter(Boolean),
+  z.array(texto(120).max(120, { message: "Máximo 120 caracteres por nombre." }))
+    .max(20, { message: "Máximo 20 nombres." }),
+);
+
+const grupo = { cantidadPersonas, viajeros };
+
 const detallePasaje = z.object({
   tipo: z.literal("pasaje"),
-  aerolinea: z.string().trim().min(1, { message: "Escribe la aerolínea." }),
-  origen: z.string().trim().min(1, { message: "Escribe el origen." }),
-  destino: z.string().trim().min(1, { message: "Escribe el destino." }),
-  fechaVuelo: z.string().trim().min(1, { message: "Escribe la fecha de vuelo." }),
-  pnr: z.string().trim().min(1, {
+  aerolinea: texto(120).min(1, { message: "Escribe la aerolínea." }),
+  origen: texto(80).min(1, { message: "Escribe el origen." }),
+  destino: texto(80).min(1, { message: "Escribe el destino." }),
+  fechaVuelo: fecha,
+  pnr: texto(20).min(1, {
     message: "Falta el número de reserva de la aerolínea (PNR). Anótalo tal como te lo dio la aerolínea.",
   }),
+  ...grupo,
 });
 
 const detalleHotel = z.object({
   tipo: z.literal("hotel"),
-  nombre: z.string().trim().min(1, { message: "Escribe el nombre del hotel." }),
-  checkIn: z.string().trim().min(1, { message: "Escribe la fecha de check-in." }),
-  checkOut: z.string().trim().min(1, { message: "Escribe la fecha de check-out." }),
-  nota: z.string().trim().optional(),
+  nombre: texto(120).min(1, { message: "Escribe el nombre del hotel." }),
+  checkIn: fecha,
+  checkOut: fecha,
+  nota: texto(2000).optional(),
+  ...grupo,
 });
 
 const detalleTour = z.object({
   tipo: z.literal("tour"),
-  nombre: z.string().trim().min(1, { message: "Escribe el nombre del tour." }),
-  fecha: z.string().trim().min(1, { message: "Escribe la fecha del tour." }),
-  nota: z.string().trim().optional(),
+  nombre: texto(120).min(1, { message: "Escribe el nombre del tour." }),
+  fecha,
+  nota: texto(2000).optional(),
+  ...grupo,
 });
 
 const detalleEntrada = z.object({
   tipo: z.literal("entrada"),
-  evento: z.string().trim().min(1, { message: "Escribe el nombre del evento." }),
-  fecha: z.string().trim().min(1, { message: "Escribe la fecha del evento." }),
-  nota: z.string().trim().optional(),
+  evento: texto(120).min(1, { message: "Escribe el nombre del evento." }),
+  fecha,
+  nota: texto(2000).optional(),
+  ...grupo,
 });
 
 export const esquemaDetalle = z.discriminatedUnion("tipo", [
@@ -72,30 +95,40 @@ const aBooleano = z.preprocess(
 );
 
 export const esquemaReserva = z.object({
-  pagadorNombre: z.string().trim().min(1, { message: "Escribe el nombre de quien paga." }),
-  pagadorTelefono: z.string().trim().min(1, { message: "Escribe un teléfono de contacto." }),
-  pagadorEmail: z.string().trim().email({ message: "Escribe un correo válido." }).optional().or(z.literal("")),
+  pagadorNombre: texto(120).min(1, { message: "Escribe el nombre de quien paga." }),
+  pagadorTelefono: texto(30).min(1, { message: "Escribe un teléfono de contacto." }),
+  pagadorEmail: z.string().trim().toLowerCase().max(254, { message: "Máximo 254 caracteres." }).email({ message: "Escribe un correo válido." }).optional().or(z.literal("")),
   esParaOtraPersona: aBooleano,
-  viajeroNombre: z.string().trim().optional(),
-  viajeroTelefono: z.string().trim().optional(),
+  viajeroNombre: texto(120).optional(),
+  viajeroTelefono: texto(30).optional(),
   // El precio puede llegar con coma decimal ("350,50") porque el input
   // nativo no la bloquea; String(...) normaliza cualquier valor de entrada
   // a texto (sin typeof) antes de reemplazar la coma y dejar que
   // z.coerce.number() establezca el valor de dominio.
   precio: z.preprocess(
     (valor) => String(valor ?? "").replace(",", "."),
-    z.coerce.number().positive({ message: "El precio tiene que ser mayor a cero." }),
+    z.coerce.number().positive({ message: "El precio tiene que ser mayor a cero." })
+      .max(10_000_000, { message: "El precio es demasiado alto. Revísalo." }),
   ),
   moneda: z.enum(MONEDAS).default("USD"),
-  fechaImportante: z.string().trim().optional().or(z.literal("")),
+  fechaImportante: z.union([fecha, z.literal("")]).optional(),
   detalle: esquemaDetalle,
 }).superRefine((datos, contexto) => {
+  if (datos.detalle.tipo === "hotel" && datos.detalle.checkOut < datos.detalle.checkIn) {
+    contexto.addIssue({ code: "custom", message: "El check-out no puede ser antes del check-in.", path: ["detalle", "checkOut"] });
+  }
+
   if (datos.esParaOtraPersona && !datos.viajeroNombre?.trim()) {
     contexto.addIssue({ code: "custom", message: "Escribe el nombre del viajero.", path: ["viajeroNombre"] });
   }
 
   if (datos.esParaOtraPersona && !datos.viajeroTelefono?.trim()) {
     contexto.addIssue({ code: "custom", message: "Escribe el teléfono del viajero.", path: ["viajeroTelefono"] });
+  }
+
+  if (!datos.esParaOtraPersona) {
+    datos.viajeroNombre = undefined;
+    datos.viajeroTelefono = undefined;
   }
 });
 
