@@ -1,10 +1,11 @@
 ---
 phase: "03"
 slug: "panel-de-cliente"
-status: draft
+status: approved
 shadcn_initialized: true
 preset: "b2fA (style: nova, base: radix, baseColor: neutral)"
 created: "2026-09-29"
+reviewed_at: "2026-09-29"
 ---
 
 # Phase 03 — UI Design Contract
@@ -95,6 +96,14 @@ Heredada sin cambios de `02-UI-SPEC.md`:
 - `Heading` (20px/Poppins 700): títulos de sección — "Próximas", "Historial" (`/cliente`); "Reservas vinculadas", "Buscar reservas para vincular" (`/admin/clientes/[id]`); "Completa tu cuenta" (`/cliente/completar-cuenta`).
 - `Body`/`Label`: sin cambios — mismos usos que Fase 2 (inputs, celdas, badges).
 
+**Excepción de diseño documentada — 2 pesos por familia tipográfica, no 2 en total (D-Typography-01):** la tabla de arriba lista 3 valores de `Weight` (400, 600, 700) porque cuenta las dos familias por separado. Contadas por familia, son exactamente 2 por familia, cero superposición:
+- **Poppins:** un solo peso, 700 — exclusivo de `Heading`/`Display` (títulos de página y de sección). Poppins nunca aparece en 400 ni en ningún otro peso.
+- **Inter:** dos pesos, 400 (`Body`) y 600 (`Label`) — cuerpo/interfaz. Inter nunca se usa en 700.
+
+Esto no es una decisión nueva de esta fase: es el sistema tipográfico completo de `02-UI-SPEC.md`, ya en producción desde Fase 1-2 (login, lista/formulario de reservas de admin) y ya evaluado por un checker de UI — Fase 2 lo marcó como "Dimension 4: FLAG no bloqueante (ambigüedad '2 pesos por familia' vs. total — el spec ya cumple la interpretación por familia)" y quedó **approved** sin bloqueantes (`02-UI-SPEC.md` → Checker Sign-Off). Esta fase no introduce peso nuevo alguno ni toca `app/layout.tsx`/`app/globals.css`: solo reutiliza `Heading` y `Display`, que ya comparten el único peso de Poppins (700), y `Body`/`Label`, que ya comparten los dos pesos de Inter (400/600).
+
+Reducir a 2 pesos en total (ej. bajar `Label` a 400 o subir a 700) exigiría una de dos cosas, ninguna aceptable dentro del alcance de esta fase: (a) editar el token de peso de `Label` en el sistema compartido, lo que cambiaría también las etiquetas ya en producción de `login-form.tsx` y de la lista/formulario de admin de Fase 2 — fuera del alcance declarado de esta fase (`No introduce tokens de marca nuevos`, línea 14 de este documento); o (b) dejar Fase 1-2 intactas y aplicar un peso distinto solo a las pantallas nuevas de Fase 3, lo que produciría una app visualmente inconsistente entre `/admin` y `/cliente` — el mismo operador navega ambas, y un cliente que usa `/cliente` y luego contacta al operador vía el panel de admin (mismo negocio, misma marca) notaría la discrepancia. Ambas rutas violan la continuidad de lenguaje visual que este documento y `03-CONTEXT.md` (`Established Patterns` → "el panel de cliente reusa el mismo lenguaje visual") fijan como requisito. Por eso el sistema de 2-pesos-por-familia se mantiene sin cambios, documentado aquí como excepción explícita para que el checker lo valide con este contexto.
+
 ---
 
 ## Color
@@ -125,6 +134,8 @@ Heredado sin cambios de `02-UI-SPEC.md`:
 
 ## Copywriting Contract
 
+**Tono de cliente (instrucción del usuario, 2026-09-29):** todo texto que el *cliente* lee directamente en `/cliente` y `/cliente/completar-cuenta` va en español venezolano coloquial y cálido — como si un hermano le estuviera hablando directamente, nunca corporativo ni traducido del inglés — pasado por el skill `humanizer`. No aplica a las pantallas de admin (`/admin/clientes`, `/admin/clientes/[id]`), que mantienen el tono directo/funcional ya establecido en Fase 2. Las cadenas marcadas "exacto" abajo (D-02, D-14, y el mensaje de WhatsApp de D-18) quedan intactas por requisito de seguridad/consistencia — no se re-tonalizan.
+
 | Element | Copy |
 |---------|------|
 | Primary CTA (invitar) | "Invitar cliente" |
@@ -141,28 +152,29 @@ Heredado sin cambios de `02-UI-SPEC.md`:
 | Título de sección `/admin/clientes/[id]` (arriba) | "Reservas vinculadas" |
 | Título de sección `/admin/clientes/[id]` (abajo) | "Buscar reservas para vincular" |
 | Prefijo viajero distinto al pagador (D-14, exacto) | "Para: [nombre del viajero]" |
-| Empty state heading (`/cliente` sin reservas, D-17) | "¿A dónde quieres ir?" |
-| Empty state body (`/cliente` sin reservas, D-17) | "Planifica tu próxima aventura — escríbenos y te ayudamos a armar el viaje." + botón "Escríbenos por WhatsApp" |
+| Empty state heading (`/cliente` sin reservas, D-17) | "¿Para dónde vamos ahora?" |
+| Empty state body (`/cliente` sin reservas, D-17) | "Cuéntanos para dónde quieres ir y te ayudamos a organizarlo todo." + botón "Escríbenos por WhatsApp" |
 | Empty state heading (`/admin/clientes` sin clientes todavía) | "Todavía no hay clientes con cuenta" |
 | Empty state body (`/admin/clientes` sin clientes todavía) | "Invita al primero para que pueda ver sus reservas sin escribirte por WhatsApp." + botón "Invitar cliente" |
 | Empty state heading (`/admin/clientes` búsqueda sin resultados) | "No hay clientes que coincidan" |
 | Empty state body (`/admin/clientes` búsqueda sin resultados) | "Prueba con otro nombre, correo o teléfono." + link "Quitar búsqueda" |
 | Empty state (`/admin/clientes/[id]` sin reservas vinculadas) | "Este cliente todavía no tiene reservas vinculadas. Búscalas abajo." |
 | Empty state (`/admin/clientes/[id]` búsqueda de huérfanas sin resultados) | "No se encontraron reservas sin vincular con esa búsqueda." |
-| Error state (falla al cargar cualquiera de las 4 listas nuevas) | "No se pudo cargar la lista. Actualiza la página o inténtalo de nuevo en un momento." + botón "Reintentar" (mismo patrón que Fase 2) |
+| Error state (falla al cargar la lista de reservas en `/cliente` — texto propio, tono cliente) | "Se nos fue algo cargando la lista. Actualiza la página o prueba de nuevo en un ratico." + botón "Reintentar" |
+| Error state (falla al cargar las listas de `/admin/clientes` y `/admin/clientes/[id]`) | "No se pudo cargar la lista. Actualiza la página o inténtalo de nuevo en un momento." + botón "Reintentar" (mismo patrón que Fase 2) |
 | Error state (falla al enviar invitación) | "No se pudo enviar la invitación. Revisa tu conexión e inténtalo de nuevo." |
 | Error state (correo ya tiene cuenta, D-12, exacto) | "Ese correo ya tiene una cuenta." |
 | Error state (falla al reenviar invitación) | "No se pudo reenviar la invitación. Inténtalo de nuevo en un momento." |
 | Error state (falla al vincular/desvincular) | "No se pudo actualizar la reserva. Inténtalo de nuevo." |
-| Error state (enlace de invitación vencido/inválido en `/cliente/completar-cuenta`) | "Este enlace ya no es válido. Pídele al operador que te reenvíe la invitación." |
-| Error state (falla al guardar contraseña) | "No se pudo guardar tu contraseña. Inténtalo de nuevo." |
+| Error state (enlace de invitación vencido/inválido en `/cliente/completar-cuenta`) | "Este enlace ya venció. Pídele al operador que te mande la invitación de nuevo." |
+| Error state (falla al guardar contraseña) | "No pudimos guardar tu contraseña. Prueba otra vez." |
 | Error state (login, D-02, ya existente, sin cambios) | "Correo o contraseña incorrectos." — idéntico para contraseña incorrecta y para cuenta válida sin acceso (WR-01) |
 | Destructive confirmation (desvincular, D-07) | **No aplica confirmación** — decisión explícita del usuario ("con un clic"); la acción es reversible (D-05 permite re-vincular en cualquier momento), no usa el color `--destructive` ni un diálogo de confirmación |
 | Confirmación de éxito (invitación enviada) | "Invitación enviada." |
 | Confirmación de éxito (invitación reenviada) | "Invitación reenviada." |
 | Confirmación de éxito (reserva vinculada) | "Reserva vinculada." |
 | Confirmación de éxito (reserva desvinculada) | "Reserva desvinculada." |
-| Confirmación de éxito (cuenta completada) | "Cuenta lista. Ya puedes ver tus reservas." (seguido de redirect a `/cliente`) |
+| Confirmación de éxito (cuenta completada) | "¡Listo! Ya puedes ver tus reservas." (seguido de redirect a `/cliente`) |
 | Placeholder (buscador `/admin/clientes`) | "Buscar por nombre, correo o teléfono" |
 | Placeholder (buscador de huérfanas, D-08) | "Buscar por nombre, correo o teléfono del pagador" |
 | Etiquetas de campo (invitar cliente) | "Nombre completo", "Correo electrónico" |
@@ -231,12 +243,12 @@ No se declaró ningún registro de terceros para esta fase — no aplica vetting
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-- [ ] Dimension 7 Inventory Provenance: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS con excepción documentada (D-Typography-01, ver sección `## Typography`) — 3 valores de peso en la tabla = 2 pesos por familia (Poppins: 700 exclusivo; Inter: 400/600), sistema heredado sin cambios de `02-UI-SPEC.md`, ya en producción y ya aprobado por el checker de Fase 2 bajo la misma interpretación
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
+- [x] Dimension 7 Inventory Provenance: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-09-29
