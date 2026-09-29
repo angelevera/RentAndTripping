@@ -179,6 +179,25 @@ Use these entry points:
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 <!-- GSD:workflow-end -->
 
+## Codex Delegation Policy
+
+Vigente desde Fase 3 y todas las fases siguientes.
+
+- **Por defecto, Codex implementa todo el código** (vía `/codex:rescue`). Claude no escribe implementación directamente salvo excepción explícita abajo.
+- **Claude:** audita el resultado de Codex, toma las decisiones de arquitectura, y resuelve lo que Codex no puede delegarse:
+  - Migraciones que tocan secretos (contraseñas, tokens, llaves — cualquier cosa que viva en `.env.admin.local`).
+  - Decisiones de seguridad (ej. el fix de WR-01 y cualquier cosa de esa naturaleza — login compartido, RLS, manejo de sesión).
+  - Cualquier tarea que el PLAN.md correspondiente marque explícitamente como no delegable.
+- **Antes de cerrar cualquier tarea delegada a Codex:** correr Anti-Slop y el skill `gsd-code-review` (o el agente "Code Reviewer") sobre el diff — no `/thermos`, que tiene `disable-model-invocation: true` y solo el usuario puede dispararlo escribiéndolo él mismo, nunca Claude por su cuenta. Ninguna tarea delegada se da por completa sin este gate automático.
+- **Instrucción estándar para Codex en cada PLAN.md:** nunca leer ni imprimir `.env.local` ni `.env.admin.local` — para verificar que una variable existe, usar únicamente `scripts/check-env.sh`.
+
+### Selección de modelo por tarea (vigente desde Fase 3)
+
+- **Haiku:** tareas mecánicas — leer archivos, verificar que un grep coincide, correr checks deterministas, formatear output.
+- **Sonnet:** código y decisiones de alcance medio — el default para la mayoría del trabajo de ejecución.
+- **Opus:** solo cuando el plan lo justifique explícitamente — arquitectura nueva de alto riesgo, decisiones con impacto en seguridad (ej. el fix de WR-01).
+- Si el modelo activo es más caro de lo que la tarea necesita, pausar y bajar de nivel antes de continuar — no seguir en un modelo sobredimensionado por inercia.
+
 <!-- GSD:profile-start -->
 
 ## Developer Profile
