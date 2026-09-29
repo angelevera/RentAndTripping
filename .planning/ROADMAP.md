@@ -69,12 +69,12 @@ Plans:
 - **Pagador vs. viajero** (confirmado en el UAT de Fase 1, 2026-09-28): quien paga una reserva no siempre es quien viaja. El pagador puede tener cuenta; el viajero puede no tenerla y no tener correo. El modelo de datos de esta fase debe distinguir ambos roles en `reservas`. Esto se implementa como una **migración nueva** (siguiente número de timestamp) — no se edita `20260927000002_reservas_pagos_recordatorios.sql` ni `20260927000003_comprobantes_privados.sql`, ya aplicadas en Fase 1. Ver PROJECT.md → Key Decisions.
 - Este cambio de esquema habilita, pero no implementa, la gestión de reservas de familiares por el pagador — esa funcionalidad es una decisión de alcance de **Fase 3** (ver su nota abajo).
 
-**Plans:** 5 plans
+**Plans:** 1/5 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Decisión pagador/viajero, migración nueva empujada a la base real, y el admin registra un pasaje de un pagador sin cuenta y lo ve en /admin (tracer)
+- [x] 02-01-PLAN.md — Decisión pagador/viajero, migración nueva empujada a la base real, y el admin registra un pasaje de un pagador sin cuenta y lo ve en /admin (tracer)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -186,7 +186,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Base y acceso seguro | 4/4 | Complete    | 2026-09-28 |
-| 2. Gestión de reservas (admin) | 0/5 | Not started | - |
+| 2. Gestión de reservas (admin) | 1/5 | In Progress|  |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
 | 5. Avisos, recordatorios y prueba real | 0/TBD | Not started | - |

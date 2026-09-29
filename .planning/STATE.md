@@ -2,17 +2,18 @@
 gsd_state_version: "1.0"
 current_phase: 02
 current_phase_name: Gestión de reservas (admin)
+current_plan: 3
 status: executing
-stopped_at: Phase 02 UI-SPEC approved
-last_updated: "2026-09-29T01:19:07.454Z"
-last_activity: 2026-09-28
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-09-29T02:00:11.974Z"
+last_activity: 2026-09-29
 last_activity_desc: Phase 01 complete, transitioned to Phase 2
-state_head: c222e1d6caaaa6bdc65a0a1c97853ea00e268f76
+state_head: ae85e18cbcc8a7e6aa341f5660102f2c91b6fc4d
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 9
-  completed_plans: 4
+  completed_plans: 5
   percent: 17
 ---
 
@@ -27,10 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 ## Current Position
 
-Phase: 02 (Gestión de reservas (admin)) — READY TO EXECUTE
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-09-28 — Phase 01 complete, transitioned to Phase 2
+Phase: 02 (Gestión de reservas (admin)) — EXECUTING
+Current Plan: 2
+Total Plans in Phase: 5
+Status: Plan 01 complete (tracer), Plan 02 next
+Last activity: 2026-09-29 — Plan 02-01 complete (pagador/viajero schema + create/list tracer)
 
 Progress: [██░░░░░░░░] 17%
 
@@ -62,6 +64,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01 P02 | 45min | 2 tasks | 8 files |
 | Phase 01 P03 | 35min | 3 tasks | 8 files |
 | Phase 01 P04 | 25min | 2 tasks | 9 files |
+| Phase 02 P01 | 95min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -83,6 +86,8 @@ Recent decisions affecting current work:
 - [Phase 01]: app/admin/page.tsx dejado sin cambios en 01-04 — ya renderiza correctamente dentro del nuevo layout de marca, sin tocar nada propio
 - [Phase 01]: un solo esquema zod (lib/validation/auth.ts) usado tanto por zodResolver en el cliente como por safeParse en el servidor — sin reglas de validación duplicadas
 - [Phase 01]: mensaje idéntico en español para contraseña incorrecta y correo desconocido (sin revelar cuentas), con el 429 de Supabase mapeado a un mensaje de límite de intentos distinto
+- [Phase 02]: D-01 opción A confirmada por el dueño: datos de pagador/viajero en la reserva, cliente_id opcional para Fase 3; teléfono del viajero obligatorio (D-04) — Puerta de un solo sentido — confirmado explícitamente antes de tocar el esquema
+- [Phase 02]: Plan 02-01: primera instalación de anti-slop Oxlint en el repo; helper etiquetaDesde() para lookups de etiqueta por columna text+CHECK — Gate de calidad requerido por política del proyecto antes de dar por completo cualquier tarea delegada a Codex
 
 ### Roadmap Evolution
 
@@ -107,6 +112,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-09-28T20:46:30.403Z
-Stopped at: Phase 02 UI-SPEC approved
-Resume file: /Users/angel/Claude/Proyectos/RentAndTripping/.planning/phases/02-gesti-n-de-reservas-admin/02-UI-SPEC.md
+Last session: 2026-09-29T01:59:41.468Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None
