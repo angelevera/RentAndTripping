@@ -1,20 +1,20 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 02
-current_phase_name: Gestión de reservas (admin)
-current_plan: 5
-status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-09-29T11:51:46.476Z"
+current_phase: 03
+current_phase_name: Panel de cliente
+current_plan: 0
+status: ready_to_plan
+stopped_at: Phase 02 complete (parcial), ready to plan Phase 03
+last_updated: "2026-09-29T14:30:00.000Z"
 last_activity: 2026-09-29
-last_activity_desc: Phase 02 execution started
+last_activity_desc: Phase 02 UAT closed — 6/7 passed, 1 blocked (Supabase Auth rate limit, accepted by owner)
 state_head: 94558a8ecfc450cdf60807eb2e43821b69a06b92
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
   completed_plans: 9
-  percent: 17
+  percent: 33
 ---
 
 # Project State
@@ -24,17 +24,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-27)
 
 **Core value:** Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar para crear reservas, cobrar, confirmar pagos y darles seguimiento — sin perder ninguna.
-**Current focus:** Phase 02 — Gestión de reservas (admin)
+**Current focus:** Phase 03 — Panel de cliente
 
 ## Current Position
 
-Phase: 02 (Gestión de reservas (admin)) — EXECUTING
-Current Plan: 5
-Total Plans in Phase: 5
-Status: Ready to execute
-Last activity: 2026-09-28 — Phase 02 execution started
+Phase: 03 (Panel de cliente) — READY TO PLAN
+Current Plan: Not started
+Total Plans in Phase: TBD
+Status: Ready to plan
+Last activity: 2026-09-29 — Phase 02 UAT cerrado (parcial)
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -91,6 +91,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Plan 02-01: primera instalación de anti-slop Oxlint en el repo; helper etiquetaDesde() para lookups de etiqueta por columna text+CHECK — Gate de calidad requerido por política del proyecto antes de dar por completo cualquier tarea delegada a Codex
 - [Phase 02]: Plan 02-02: shadcn init requiere --preset en 4.21.0 (no anticipado por la investigación); elegido 'nova' por ser el único cuyo set de paquetes por defecto coincide exacto con la lista aprobada en el gate de Task 1
 - [Phase 02]: Plan 02-02: el componente 'form' del PLAN es un stub no funcional en el estilo radix-nova de shadcn 4.21.0 (confirmado contra el registro en vivo); se instaló 'field' en su lugar sin tocar la lista de paquetes aprobados — planes futuros que construyan el formulario de reserva deben componer Field/FieldLabel/FieldError, no Form/FormField
+- [Phase 02]: UAT cerrado como `partial` (aceptado por el dueño 2026-09-29) — 6/7 pruebas humanas pasaron, incluyendo la corrección WR-01 (segundo toast en una sesión); la única bloqueada es correr `npm test` completo en una sola corrida, por el límite de tasa de sign-in de Supabase Auth (estructural, no defecto de código, ver [[project_supabase_auth_rate_limit]])
+- [Phase 02]: Bug encontrado y corregido durante el UAT: `tests/e2e/global-setup.ts` revisaba `process.env.E2E_BASE_URL` antes de cargar `.env.admin.local` con `loadEnv()`, por lo que la variable nunca se leía — reordenado, `E2E_BASE_URL` ahora sí sobreescribe el servidor de pruebas efímero (commit `8b59e07`)
 
 ### Roadmap Evolution
 
@@ -111,10 +113,10 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 | Category | Item | Status | Deferred At | Milestone |
 |----------|------|--------|-------------|-----------|
-| *(none)* | | | | |
+| UX | Campo "Nombres de los viajeros": textarea libre → lista de campos individuales con botón "+" por viajero | Deferred | 2026-09-29 (Phase 02 UAT) | v1 |
 
 ## Session Continuity
 
-Last session: 2026-09-29T02:29:15.039Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-09-29T14:30:00.000Z
+Stopped at: Phase 02 complete (parcial), ready to plan Phase 03
 Resume file: None

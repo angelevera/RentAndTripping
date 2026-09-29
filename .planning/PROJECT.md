@@ -19,11 +19,10 @@ Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Panel de administración: crear, editar, listar/buscar y dar seguimiento a reservas (pasajes, hoteles, tours, entradas) — Phase 2
 
 ### Active
 
-- [ ] Panel de administración: crear y gestionar reservas (pasajes, hoteles, tours, entradas)
 - [ ] Registro de cobros en efectivo, Zelle, Binance, y tarjeta internacional vía link de pago Payoneer
 - [ ] Subida de comprobante de pago (cliente) y confirmación manual (operador)
 - [ ] Panel de cliente con login propio para ver sus propias reservas y su estado
@@ -60,12 +59,12 @@ Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | App web responsive tipo PWA, no apps nativas | Ni el dueño ni el desarrollador programan; evita mantener dos codebases y pasar por revisión de app stores | — Pending |
-| Next.js + Supabase + Vercel | Rápido de construir, barato, fácil de mantener; login/BD/storage ya incluidos en Supabase | — Pending |
+| Next.js + Supabase + Vercel | Rápido de construir, barato, fácil de mantener; login/BD/storage ya incluidos en Supabase | ✓ Good — Fase 2 confirma el patrón (Server Actions + RLS), único límite encontrado es el rate limit de Auth en sign-ins masivos de test, no de producción |
 | Cobro con tarjeta vía link de pago Payoneer (no checkout embebido) | No hay LLC/cuenta empresarial todavía; el checkout embebido de Payoneer requiere aprobación de partner | — Pending |
 | Confirmación de pagos manual en todos los métodos | Sin acceso a webhooks automáticos de Zelle/Binance/Payoneer en esta etapa | — Pending |
 | Color de marca `#482583`, tipografía Poppins/Fredoka (títulos) + Inter (cuerpo) | Extraído directamente del logo oficial; no existe la fuente original | ✓ Good |
 | Fotografía de stock (Unsplash/Pexels) en vez de fotos propias | El negocio no tiene banco de fotos propio todavía | — Pending |
-| Una reserva distingue al pagador (quien paga, puede tener cuenta) del viajero (quien viaja, puede no tener cuenta ni correo) | Confirmado en el UAT de Fase 1: habrá clientes sin cuenta/correo, y quien paga no siempre es quien viaja | — Pending. Se implementa en Fase 2 como **migración nueva** (no se edita el esquema de reservas/pagos ya aplicado en Fase 1). La gestión de reservas de familiares por el pagador es una decisión de **alcance de Fase 3**, pero el modelo de datos de Fase 2 debe permitirla |
+| Una reserva distingue al pagador (quien paga, puede tener cuenta) del viajero (quien viaja, puede no tener cuenta ni correo) | Confirmado en el UAT de Fase 1: habrá clientes sin cuenta/correo, y quien paga no siempre es quien viaja | ✓ Good — implementado en Fase 2 (migración `20260929012532_pagador_viajero_reservas.sql`). La gestión de reservas de familiares por el pagador sigue siendo una decisión de **alcance de Fase 3** |
 | Fase 6 nueva: sitio público de presentación (home), sin login, estilo Apple | El negocio no tiene ningún escaparate fuera de Instagram/WhatsApp; se agrega después del MVP operativo (Fases 1-5) para no distraer del flujo de reservas/pagos. Usa la guía de estilo de `idea.md` sección 8 (Apple + identidad de marca morado `#482583`) | — Pending. Solo anotada en ROADMAP.md; no se ha corrido `/gsd-discuss-phase 6` ni `/gsd-plan-phase 6` todavía |
 
 ## Evolution
@@ -86,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-27 after initialization*
+*Last updated: 2026-09-29 after Phase 2*
