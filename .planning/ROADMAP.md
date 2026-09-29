@@ -68,11 +68,28 @@ Plans:
 - **Pagador vs. viajero** (confirmado en el UAT de Fase 1, 2026-09-28): quien paga una reserva no siempre es quien viaja. El pagador puede tener cuenta; el viajero puede no tenerla y no tener correo. El modelo de datos de esta fase debe distinguir ambos roles en `reservas`. Esto se implementa como una **migración nueva** (siguiente número de timestamp) — no se edita `20260927000002_reservas_pagos_recordatorios.sql` ni `20260927000003_comprobantes_privados.sql`, ya aplicadas en Fase 1. Ver PROJECT.md → Key Decisions.
 - Este cambio de esquema habilita, pero no implementa, la gestión de reservas de familiares por el pagador — esa funcionalidad es una decisión de alcance de **Fase 3** (ver su nota abajo).
 
-**Plans**: TBD
+**Plans:** 5 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Decisión pagador/viajero, migración nueva empujada a la base real, y el admin registra un pasaje de un pagador sin cuenta y lo ve en /admin (tracer)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — Paquetes aprobados por una persona, identidad de marca (shadcn/ui, Poppins/Inter, avisos) y lista con insignias de estado proveedor/pago
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-03-PLAN.md — Formulario completo: pasaje, hotel, tour o entrada, viajero distinto, grupo de viajeros y fecha importante, con validación en español probada
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 02-04-PLAN.md — Editar cualquier reserva y marcar "confirmada con el proveedor" o "con problema", independiente del pago
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 02-05-PLAN.md — Búsqueda por nombre, filtros por estado y tipo, y páginas de 20
 
 ### Phase 3: Panel de cliente
 
@@ -144,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Base y acceso seguro | 4/4 | Complete    | 2026-09-28 |
-| 2. Gestión de reservas (admin) | 0/TBD | Not started | - |
+| 2. Gestión de reservas (admin) | 0/5 | Not started | - |
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
 | 5. Avisos, recordatorios y prueba real | 0/TBD | Not started | - |
