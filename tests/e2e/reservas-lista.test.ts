@@ -6,6 +6,7 @@ import {
   createTestUser,
   loginJar,
   sweepStaleTestUsers,
+  TEST_PREFIX,
   type TestUser,
 } from "../helpers/fixtures";
 
@@ -51,6 +52,9 @@ describe("lista de reservas en /admin", () => {
   let r1Id: string;
   let r2Id: string;
   let r3Id: string;
+  let anaId: string;
+  let betoId: string;
+  let pageIds: string[];
 
   beforeAll(async () => {
     await sweepStaleTestUsers();
@@ -88,6 +92,37 @@ describe("lista de reservas en /admin", () => {
     });
 
     r3Id = r3.reservaId;
+
+    const ana = await createReservaSinCuentaFixture({
+      adminId: admin.id,
+      pagadorNombre: `${TEST_PREFIX} filtro Ana`,
+      estadoProveedor: "con_problema",
+      notaProblema: "Revisar reserva de prueba.",
+      tipo: "hotel",
+    });
+
+    anaId = ana.reservaId;
+
+    const beto = await createReservaSinCuentaFixture({
+      adminId: admin.id,
+      pagadorNombre: `${TEST_PREFIX} filtro Beto`,
+      estadoProveedor: "pendiente",
+      tipo: "pasaje",
+    });
+
+    betoId = beto.reservaId;
+
+    pageIds = [];
+
+    for (let i = 1; i <= 21; i += 1) {
+      const resultado = await createReservaSinCuentaFixture({
+        adminId: admin.id,
+        pagadorNombre: `${TEST_PREFIX}-pag-${String(i).padStart(2, "0")}`,
+        createdAt: `2097-01-${String(i).padStart(2, "0")}T00:00:00Z`,
+      });
+
+      pageIds.push(resultado.reservaId);
+    }
   });
 
   afterAll(async () => {
@@ -174,5 +209,73 @@ describe("lista de reservas en /admin", () => {
     expect(fragmento).toContain("—");
     expect(fragmento).not.toContain("5000");
     expect(fragmento).not.toContain("5.000");
+  });
+
+  it("filtra por búsqueda y estado, por tipo y conserva filtro cuando no hay JavaScript", async () => {
+    const baseUrl = inject("baseUrl");
+    const jar = await loginJar({ baseUrl, user: admin });
+
+    const porEstado = await fetch(new URL(`/admin?q=${encodeURIComponent(`${TEST_PREFIX} filtro`)}&estado=con_problema`, baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    const htmlEstado = await porEstado.text();
+    expect(htmlEstado).toContain(`data-reserva-id="${anaId}"`);
+    expect(htmlEstado).not.toContain(`data-reserva-id="${betoId}"`);
+
+    const porTipo = await fetch(new URL(`/admin?q=${encodeURIComponent(`${TEST_PREFIX} filtro`)}&tipo=pasaje`, baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    const htmlTipo = await porTipo.text();
+    expect(htmlTipo).toContain(`data-reserva-id="${betoId}"`);
+    expect(htmlTipo).not.toContain(`data-reserva-id="${anaId}"`);
+    expect(htmlEstado).toContain('method="get"');
+    expect(htmlEstado).toContain('name="estado" value="con_problema"');
+    expect(htmlEstado).toContain("Buscar por nombre de cliente");
+  });
+
+  it("muestra estado vacío filtrado y sanea parámetros alterados", async () => {
+    const baseUrl = inject("baseUrl");
+    const jar = await loginJar({ baseUrl, user: admin });
+
+    const vacio = await fetch(new URL(`/admin?q=${encodeURIComponent(`${TEST_PREFIX} inexistente`)}`, baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    const htmlVacio = await vacio.text();
+    expect(htmlVacio).toContain("No hay reservas que coincidan");
+    expect(htmlVacio).toContain("Prueba con otro nombre o quita algún filtro.");
+    expect(htmlVacio).toContain("Quitar filtros");
+
+    const tampered = await fetch(new URL("/admin?estado=cancelada&tipo=crucero&pagina=-4", baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    expect(tampered.status).toBe(200);
+    expect(await tampered.text()).toContain('data-testid="panel-admin"');
+  });
+
+  it("navega páginas conservando la búsqueda y mostrando el último fixture en la segunda página", async () => {
+    const baseUrl = inject("baseUrl");
+    const jar = await loginJar({ baseUrl, user: admin });
+    const q = `${TEST_PREFIX}-pag-`;
+
+    const primera = await fetch(new URL(`/admin?q=${encodeURIComponent(q)}`, baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    const htmlPrimera = await primera.text();
+    expect(htmlPrimera).toContain('>Siguiente</a>');
+    expect(htmlPrimera).toContain(`pagina=2`);
+    expect(htmlPrimera).toContain(`q=${encodeURIComponent(q)}`);
+
+    const segunda = await fetch(new URL(`/admin?q=${encodeURIComponent(q)}&pagina=2`, baseUrl), {
+      headers: { Cookie: jar.header() },
+    });
+
+    const htmlSegunda = await segunda.text();
+    expect(htmlSegunda).toContain('>Anterior</a>');
+    expect(htmlSegunda).toContain(`data-reserva-id="${pageIds[0]}"`);
   });
 });

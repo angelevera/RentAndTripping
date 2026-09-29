@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listarReservas, type FilaListaReserva } from "@/lib/reservas/listar";
+import { hayFiltros, parametrosAQuery, type ParametrosLista } from "@/lib/reservas/parametros-lista";
 import { ETIQUETAS_ESTADO_PROVEEDOR, ETIQUETAS_TIPO, etiquetaDesde } from "@/lib/validation/reservas";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -195,31 +196,72 @@ function ListaVacia() {
   );
 }
 
-function ListaError() {
+function ListaError({ parametros }: { parametros: ParametrosLista }) {
   return (
     <div className="flex flex-col items-start gap-3 py-8" role="alert">
       <p className="text-red-700">
         No se pudieron cargar las reservas. Actualiza la página o inténtalo de nuevo en un momento.
       </p>
       <Button asChild variant="outline" className="min-h-11">
-        <Link href="/admin">Reintentar</Link>
+        <Link href={`/admin?${parametrosAQuery(parametros)}`}>Reintentar</Link>
       </Button>
     </div>
   );
 }
 
-export async function ListaReservas({ pagina }: { pagina: number }) {
+function ListaFiltradaVacia() {
+  return (
+    <div className="flex flex-col items-center gap-3 py-12 text-center">
+      <h2 className="font-display text-xl font-bold">No hay reservas que coincidan</h2>
+      <p className="text-muted-foreground">Prueba con otro nombre o quita algún filtro.</p>
+      <Link href="/admin" className="min-h-11 inline-flex items-center font-medium text-primary underline-offset-4 hover:underline">
+        Quitar filtros
+      </Link>
+    </div>
+  );
+}
+
+function Paginacion({ parametros, pagina, totalPaginas }: {
+  parametros: ParametrosLista;
+  pagina: number;
+  totalPaginas: number;
+}) {
+  if (totalPaginas <= 1) return null;
+  const anterior = pagina > 1;
+  const siguiente = pagina < totalPaginas;
+  const hrefAnterior = `/admin?${parametrosAQuery(parametros, { pagina: pagina - 1 })}`;
+  const hrefSiguiente = `/admin?${parametrosAQuery(parametros, { pagina: pagina + 1 })}`;
+
+  return (
+    <nav aria-label="Paginación de reservas" className="flex items-center justify-between gap-3 pt-4">
+      {anterior ? (
+        <Button asChild variant="outline" className="min-h-11"><Link href={hrefAnterior}>Anterior</Link></Button>
+      ) : (
+        <Button variant="outline" className="min-h-11" disabled aria-disabled="true">Anterior</Button>
+      )}
+      <span className="text-sm text-muted-foreground">Página {pagina} de {totalPaginas}</span>
+      {siguiente ? (
+        <Button asChild variant="outline" className="min-h-11"><Link href={hrefSiguiente}>Siguiente</Link></Button>
+      ) : (
+        <Button variant="outline" className="min-h-11" disabled aria-disabled="true">Siguiente</Button>
+      )}
+    </nav>
+  );
+}
+
+export async function ListaReservas({ parametros }: { parametros: ParametrosLista }) {
   const supabase = await createClient();
-  const { filas, error } = await listarReservas(supabase, { pagina });
+  const { filas, error, pagina, totalPaginas } = await listarReservas(supabase, parametros);
 
-  if (error) return <ListaError />;
+  if (error) return <ListaError parametros={parametros} />;
 
-  if (filas.length === 0) return <ListaVacia />;
+  if (filas.length === 0) return hayFiltros(parametros) ? <ListaFiltradaVacia /> : <ListaVacia />;
 
   return (
     <>
       <TablaReservas filas={filas} />
       <TarjetasReservas filas={filas} />
+      <Paginacion parametros={parametros} pagina={pagina} totalPaginas={totalPaginas} />
     </>
   );
 }

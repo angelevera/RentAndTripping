@@ -8,6 +8,7 @@ import {
   serviceClient,
   signInAs,
   sweepStaleTestUsers,
+  TEST_PREFIX,
   type TestUser,
 } from "../helpers/fixtures";
 import { listarReservas } from "@/lib/reservas/listar";
@@ -30,6 +31,18 @@ let r1Id: string;
 let r2Id: string;
 
 let r3Id: string;
+
+const paginasIds: string[] = [];
+
+let porcentajeId: string;
+
+let ceroId: string;
+
+let filtroProblemaId: string;
+
+let filtroHotelId: string;
+
+let filtroCombinadoId: string;
 
 beforeAll(async () => {
   await sweepStaleTestUsers();
@@ -68,6 +81,50 @@ beforeAll(async () => {
   });
 
   r3Id = r3.reservaId;
+
+  for (let i = 1; i <= 21; i += 1) {
+    const sufijo = String(i).padStart(2, "0");
+
+    const resultado = await createReservaSinCuentaFixture({
+      adminId: admin.id,
+      pagadorNombre: `${TEST_PREFIX}-pag-${sufijo}`,
+      createdAt: `2098-01-${String(i).padStart(2, "0")}T00:00:00Z`,
+    });
+
+    paginasIds.push(resultado.reservaId);
+  }
+
+  const porcentaje = await createReservaSinCuentaFixture({
+    adminId: admin.id,
+    pagadorNombre: `${TEST_PREFIX} desc 100%`,
+  });
+
+  porcentajeId = porcentaje.reservaId;
+  const cero = await createReservaSinCuentaFixture({ adminId: admin.id, pagadorNombre: `${TEST_PREFIX} desc 1000` });
+  ceroId = cero.reservaId;
+
+  const problema = await createReservaSinCuentaFixture({
+    adminId: admin.id, pagadorNombre: `${TEST_PREFIX} filtro problema`, estadoProveedor: "con_problema",
+    notaProblema: "La aerolínea cambió el horario.",
+  });
+
+  filtroProblemaId = problema.reservaId;
+
+  const hotel = await createReservaSinCuentaFixture({
+    adminId: admin.id, pagadorNombre: `${TEST_PREFIX} filtro hotel`, tipo: "hotel",
+  });
+
+  filtroHotelId = hotel.reservaId;
+
+  const combinado = await createReservaSinCuentaFixture({
+    adminId: admin.id,
+    pagadorNombre: `${TEST_PREFIX} filtro ambos`,
+    estadoProveedor: "con_problema",
+    notaProblema: "El hotel canceló la reserva.",
+    tipo: "hotel",
+  });
+
+  filtroCombinadoId = combinado.reservaId;
 });
 
 afterAll(async () => {
@@ -110,6 +167,40 @@ describe("listarReservas", () => {
 
     expect(resultado.error).toBe(true);
     expect(resultado.filas).toEqual([]);
+  });
+
+  it("busca por nombre sin distinguir mayúsculas y pagina/clampa resultados", async () => {
+    const clientAdmin = await signInAs(admin);
+    const q = `${TEST_PREFIX}-pag`;
+    const primera = await listarReservas(clientAdmin, { pagina: 1, q });
+    expect(primera.total).toBe(21);
+    expect(primera.filas.map((f) => f.id)).toEqual(paginasIds.slice().reverse().slice(0, 20));
+    expect(primera.totalPaginas).toBe(2);
+    const segunda = await listarReservas(clientAdmin, { pagina: 2, q });
+    expect(segunda.filas.map((f) => f.id)).toEqual([paginasIds[0]]);
+    const fuera = await listarReservas(clientAdmin, { pagina: 99, q });
+    expect(fuera.pagina).toBe(2);
+    expect(fuera.filas.map((f) => f.id)).toEqual([paginasIds[0]]);
+    expect((await listarReservas(clientAdmin, { pagina: 1, q: q.toUpperCase() })).total).toBe(21);
+  });
+
+  it("trata porcentaje como literal y combina estado/tipo con búsqueda", async () => {
+    const clientAdmin = await signInAs(admin);
+    const literal = await listarReservas(clientAdmin, { pagina: 1, q: "100%" });
+    expect(literal.filas.map((f) => f.id)).toContain(porcentajeId);
+    expect(literal.filas.map((f) => f.id)).not.toContain(ceroId);
+    const estado = await listarReservas(clientAdmin, { pagina: 1, estado: "con_problema" });
+    expect(estado.filas.map((f) => f.id)).toContain(filtroProblemaId);
+    expect(estado.filas.map((f) => f.id)).not.toContain(filtroHotelId);
+    const tipo = await listarReservas(clientAdmin, { pagina: 1, tipo: "hotel" });
+    expect(tipo.filas.map((f) => f.id)).toContain(filtroHotelId);
+    expect(tipo.filas.map((f) => f.id)).not.toContain(filtroProblemaId);
+
+    const combinada = await listarReservas(clientAdmin, {
+      pagina: 1, q: `${TEST_PREFIX} filtro`, estado: "con_problema", tipo: "hotel",
+    });
+
+    expect(combinada.filas.map((f) => f.id)).toEqual([filtroCombinadoId]);
   });
 });
 

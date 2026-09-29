@@ -3,10 +3,17 @@ import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { Button } from "@/components/ui/button";
 import { ListaReservas, ListaReservasSkeleton } from "./reservas/lista-reservas";
+import { FiltrosReservas } from "./reservas/filtros-reservas";
 import { cerrarSesion } from "./actions";
+import { leerParametrosLista, parametrosAQuery } from "@/lib/reservas/parametros-lista";
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const admin = await requireAdmin();
+  const parametros = leerParametrosLista(await searchParams);
 
   return (
     <main data-testid="panel-admin" className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
@@ -17,8 +24,10 @@ export default async function AdminPage() {
         </Button>
       </div>
 
-      <Suspense fallback={<ListaReservasSkeleton />}>
-        <ListaReservas pagina={1} />
+      <FiltrosReservas valores={parametros} />
+
+      <Suspense key={parametrosAQuery(parametros)} fallback={<ListaReservasSkeleton />}>
+        <ListaReservas parametros={parametros} />
       </Suspense>
 
       <div className="flex flex-col gap-4 border-t border-gray-100 pt-8">
