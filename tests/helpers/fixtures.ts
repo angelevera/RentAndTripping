@@ -1,13 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Json } from "@/lib/database.types";
 
 const RUN_ID = Math.random().toString(36).slice(2, 8);
+
 let sequence = 0;
+
+/**
+ * Prefijo de toda reserva creada por pruebas automáticas — permite que el
+ * operador identifique a simple vista una fila de prueba en /admin, y que
+ * cleanupTestUsers/sweepStaleTestUsers la encuentren y la borren.
+ */
+export const TEST_PREFIX = `rt-test-${RUN_ID}`;
 
 function requireEnv(name: string): string {
   const value = process.env[name];
+
   if (!value) {
     throw new Error(`Falta la variable de entorno ${name} para los tests`);
   }
+
   return value;
 }
 
@@ -50,9 +61,13 @@ export function serviceClient() {
 }
 
 const trackedUserIds = new Set<string>();
+
 const trackedReservaIds = new Set<string>();
+
 const trackedPagoIds = new Set<string>();
+
 const trackedRecordatorioIds = new Set<string>();
+
 const trackedStoragePaths = new Set<string>();
 
 export interface TestUser {
@@ -91,6 +106,7 @@ export async function createTestUser(role: "admin" | "customer"): Promise<TestUs
       .from("profiles")
       .update({ role: "admin" })
       .eq("id", data.user.id);
+
     if (updateError) {
       throw new Error(
         `No se pudo promover a admin el usuario de prueba ${email}: ${updateError.message}`,
@@ -107,13 +123,16 @@ export async function createTestUser(role: "admin" | "customer"): Promise<TestUs
  */
 export async function signInAs(user: TestUser) {
   const client = publicClient();
+
   const { error } = await client.auth.signInWithPassword({
     email: user.email,
     password: user.password,
   });
+
   if (error) {
     throw new Error(`No se pudo iniciar sesión como ${user.email}: ${error.message}`);
   }
+
   return client;
 }
 
@@ -148,31 +167,26 @@ export async function createReservaFixture({
       precio: 100,
       moneda: "USD",
       created_by: adminId,
+      pagador_nombre: `${TEST_PREFIX} cliente`,
+      pagador_telefono: "0000-0000000",
     })
     .select("id")
     .single();
+
   if (reservaError || !reserva) {
     throw new Error(`No se pudo crear la reserva de prueba: ${reservaError?.message}`);
   }
+
   trackedReservaIds.add(reserva.id);
 
-  const { data: pago, error: pagoError } = await admin
-    .from("pagos")
-    .insert({
-      reserva_id: reserva.id,
-      monto: 100,
-      moneda: "USD",
-      metodo: "zelle",
-      created_by: adminId,
-    })
-    .select("id")
-    .single();
-  if (pagoError || !pago) {
-    throw new Error(`No se pudo crear el pago de prueba: ${pagoError?.message}`);
-  }
-  trackedPagoIds.add(pago.id);
+  const { pagoId } = await createPagoFixture({
+    reservaId: reserva.id,
+    adminId,
+    estado: "pendiente_revision",
+  });
 
   const fechaEnvioProgramada = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
   const { data: recordatorio, error: recordatorioError } = await admin
     .from("recordatorios")
     .insert({
@@ -182,12 +196,176 @@ export async function createReservaFixture({
     })
     .select("id")
     .single();
+
   if (recordatorioError || !recordatorio) {
     throw new Error(`No se pudo crear el recordatorio de prueba: ${recordatorioError?.message}`);
   }
+
   trackedRecordatorioIds.add(recordatorio.id);
 
-  return { reservaId: reserva.id, pagoId: pago.id, recordatorioId: recordatorio.id };
+  return { reservaId: reserva.id, pagoId, recordatorioId: recordatorio.id };
+}
+
+interface ReservaSinCuentaFixtureParams {
+  adminId: string;
+  pagadorNombre?: string;
+  tipo?: string;
+  detalle?: Record<string, Json>;
+  precio?: number;
+  moneda?: "USD" | "VES";
+  estadoProveedor?: "pendiente" | "confirmada" | "con_problema";
+  notaProblema?: string;
+  fechaImportante?: string;
+  viajeroNombre?: string;
+  viajeroTelefono?: string;
+  createdAt?: string;
+}
+
+interface FilaReservaSinCuenta {
+  cliente_id: null;
+  created_by: string;
+  pagador_nombre: string;
+  pagador_telefono: string;
+  tipo: string;
+  detalle: Record<string, Json>;
+  precio: number;
+  moneda: "USD" | "VES";
+  estado_proveedor?: "pendiente" | "confirmada" | "con_problema";
+  nota_problema?: string;
+  fecha_importante?: string;
+  viajero_nombre?: string;
+  viajero_telefono?: string;
+  created_at?: string;
+}
+
+interface ReservaSinCuentaFixture {
+  reservaId: string;
+  pagadorNombre: string;
+}
+
+/**
+ * Crea, con serviceClient, una reserva sin cuenta de cliente (cliente_id
+ * null): el caso normal desde la Fase 2 — el admin registra la venta con los
+ * datos de contacto de quien paga directamente en la reserva (D-01).
+ */
+export async function createReservaSinCuentaFixture({
+  adminId,
+  pagadorNombre,
+  tipo = "tour",
+  detalle,
+  precio = 100,
+  moneda = "USD",
+  estadoProveedor,
+  notaProblema,
+  fechaImportante,
+  viajeroNombre,
+  viajeroTelefono,
+  createdAt,
+}: ReservaSinCuentaFixtureParams): Promise<ReservaSinCuentaFixture> {
+  const admin = serviceClient();
+  const n = ++sequence;
+  const nombre = pagadorNombre ?? `${TEST_PREFIX} pagador ${n}`;
+
+  const fila: FilaReservaSinCuenta = {
+    cliente_id: null,
+    created_by: adminId,
+    pagador_nombre: nombre,
+    pagador_telefono: "0000-0000000",
+    tipo,
+    detalle: detalle ?? { tipo, nombre: "Tour de prueba", fecha: "2026-12-01" },
+    precio,
+    moneda,
+  };
+
+  if (estadoProveedor !== undefined) fila.estado_proveedor = estadoProveedor;
+
+  if (notaProblema !== undefined) fila.nota_problema = notaProblema;
+
+  if (fechaImportante !== undefined) fila.fecha_importante = fechaImportante;
+
+  if (viajeroNombre !== undefined) fila.viajero_nombre = viajeroNombre;
+
+  if (viajeroTelefono !== undefined) fila.viajero_telefono = viajeroTelefono;
+
+  if (createdAt !== undefined) fila.created_at = createdAt;
+
+  const { data: reserva, error: reservaError } = await admin
+    .from("reservas")
+    .insert(fila)
+    .select("id")
+    .single();
+
+  if (reservaError || !reserva) {
+    throw new Error(`No se pudo crear la reserva sin cuenta de prueba: ${reservaError?.message}`);
+  }
+
+  trackedReservaIds.add(reserva.id);
+
+  return { reservaId: reserva.id, pagadorNombre: nombre };
+}
+
+interface PagoFixtureParams {
+  reservaId: string;
+  adminId: string;
+  estado: "pendiente_revision" | "confirmado";
+  monto?: number;
+  moneda?: "USD" | "VES";
+  tasaCambio?: number;
+}
+
+interface FilaPago {
+  reserva_id: string;
+  monto: number;
+  moneda: "USD" | "VES";
+  metodo: "zelle";
+  estado: "pendiente_revision" | "confirmado";
+  created_by: string;
+  tasa_cambio?: number;
+}
+
+interface PagoFixture {
+  pagoId: string;
+}
+
+/**
+ * Crea, con serviceClient, un pago de prueba para una reserva ya existente.
+ * moneda VES exige tasaCambio (constraint pagos_tasa_cambio_solo_en_bs de
+ * 20260927000004).
+ */
+export async function createPagoFixture({
+  reservaId,
+  adminId,
+  estado,
+  monto = 100,
+  moneda = "USD",
+  tasaCambio,
+}: PagoFixtureParams): Promise<PagoFixture> {
+  const admin = serviceClient();
+
+  const fila: FilaPago = {
+    reserva_id: reservaId,
+    monto,
+    moneda,
+    metodo: "zelle",
+    estado,
+    created_by: adminId,
+  };
+
+  if (moneda === "VES") fila.tasa_cambio = tasaCambio;
+
+  const { data: pago, error: pagoError } = await admin
+    .from("pagos")
+    .insert(fila)
+    .select("id")
+    .single();
+
+  if (pagoError || !pago) {
+    throw new Error(`No se pudo crear el pago de prueba: ${pagoError?.message}`);
+  }
+
+  trackedPagoIds.add(pago.id);
+
+  return { pagoId: pago.id };
 }
 
 /**
@@ -232,9 +410,32 @@ export async function cleanupTestUsers(): Promise<void> {
     trackedReservaIds.clear();
   }
 
+  // Reservas creadas a través de la UI (por ejemplo, por un Server Action
+  // invocado en un test e2e) nunca pasan por createReservaFixture/
+  // createReservaSinCuentaFixture, así que no están en trackedReservaIds.
+  // Se identifican por created_by y se limpian en el mismo orden (Fase 2).
+  if (trackedUserIds.size > 0) {
+    const userIds = Array.from(trackedUserIds);
+
+    const { data: reservasPorCreador } = await admin
+      .from("reservas")
+      .select("id")
+      .in("created_by", userIds);
+
+    const reservaIds = (reservasPorCreador ?? []).map((r) => r.id);
+
+    if (reservaIds.length > 0) {
+      await admin.from("recordatorios").delete().in("reserva_id", reservaIds);
+      await admin.from("pagos").delete().in("reserva_id", reservaIds);
+      await admin.from("reservas").delete().in("id", reservaIds);
+    }
+  }
+
   const ids = Array.from(trackedUserIds);
+
   for (const id of ids) {
     const { error } = await admin.auth.admin.deleteUser(id);
+
     if (!error) {
       trackedUserIds.delete(id);
     }
@@ -258,23 +459,30 @@ export async function sweepStaleTestUsers(): Promise<void> {
 
   while (true) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+
     if (error || !data) {
       break;
     }
+
     const users = data.users ?? [];
+
     if (users.length === 0) {
       break;
     }
+
     for (const user of users) {
       if (!user.email?.startsWith("rt-test-")) continue;
       const createdAt = new Date(user.created_at).getTime();
+
       if (createdAt < staleBefore) {
         staleUserIds.push(user.id);
       }
     }
+
     if (users.length < perPage) {
       break;
     }
+
     page += 1;
   }
 
@@ -284,6 +492,7 @@ export async function sweepStaleTestUsers(): Promise<void> {
 
   for (const uid of staleUserIds) {
     const { data: files } = await admin.storage.from("comprobantes").list(uid);
+
     if (files && files.length > 0) {
       await admin.storage.from("comprobantes").remove(files.map((f) => `${uid}/${f.name}`));
     }
@@ -293,10 +502,12 @@ export async function sweepStaleTestUsers(): Promise<void> {
     .from("reservas")
     .select("id")
     .in("cliente_id", staleUserIds);
+
   const { data: reservasPorCreador } = await admin
     .from("reservas")
     .select("id")
     .in("created_by", staleUserIds);
+
   const reservaIds = Array.from(
     new Set([
       ...(reservasPorCliente ?? []).map((r) => r.id),
@@ -333,15 +544,18 @@ export class CookieJar {
       const parts = raw.split(";").map((p) => p.trim());
       const [nameValue, ...attrs] = parts;
       const eqIndex = nameValue.indexOf("=");
+
       if (eqIndex === -1) continue;
       const name = nameValue.slice(0, eqIndex);
       const value = nameValue.slice(eqIndex + 1);
 
       let maxAge: number | null = null;
       let expires: number | null = null;
+
       for (const attr of attrs) {
         const [attrNameRaw, attrValueRaw] = attr.split("=");
         const attrName = attrNameRaw?.toLowerCase();
+
         if (attrName === "max-age" && attrValueRaw !== undefined) {
           maxAge = Number(attrValueRaw);
         } else if (attrName === "expires" && attrValueRaw !== undefined) {
@@ -358,6 +572,7 @@ export class CookieJar {
       }
 
       let expiresAtMs: number | null = null;
+
       if (maxAge !== null) {
         expiresAtMs = Date.now() + maxAge * 1000;
       } else if (expires !== null) {
@@ -370,20 +585,26 @@ export class CookieJar {
 
   get(name: string): string | undefined {
     const cookie = this.cookies.get(name);
+
     if (!cookie) return undefined;
+
     if (cookie.expiresAtMs !== null && cookie.expiresAtMs <= Date.now()) {
       this.cookies.delete(name);
+
       return undefined;
     }
+
     return cookie.value;
   }
 
   header(): string {
     const parts: string[] = [];
+
     for (const [name, cookie] of this.cookies.entries()) {
       if (cookie.expiresAtMs !== null && cookie.expiresAtMs <= Date.now()) continue;
       parts.push(`${name}=${cookie.value}`);
     }
+
     return parts.join("; ");
   }
 }
@@ -401,17 +622,23 @@ function decodeHtmlEntities(value: string): string {
 function extractFormMarkup(html: string, formTestId: string): string {
   const marker = `data-testid="${formTestId}"`;
   const markerIndex = html.indexOf(marker);
+
   if (markerIndex === -1) {
     throw new Error(`No se encontró un <form data-testid="${formTestId}"> en la página`);
   }
+
   const formStart = html.lastIndexOf("<form", markerIndex);
+
   if (formStart === -1) {
     throw new Error(`No se encontró la apertura <form> antes de ${marker}`);
   }
+
   const formEnd = html.indexOf("</form>", markerIndex);
+
   if (formEnd === -1) {
     throw new Error(`No se encontró el cierre </form> después de ${marker}`);
   }
+
   return html.slice(formStart, formEnd + "</form>".length);
 }
 
@@ -419,17 +646,82 @@ function extractHiddenInputs(formMarkup: string): Record<string, string> {
   const hidden: Record<string, string> = {};
   const inputRegex = /<input\b[^>]*>/gi;
   const matches = formMarkup.match(inputRegex) ?? [];
+
   for (const tag of matches) {
     const typeMatch = tag.match(/type\s*=\s*"([^"]*)"/i);
+
     if (!typeMatch || typeMatch[1].toLowerCase() !== "hidden") continue;
     const nameMatch = tag.match(/name\s*=\s*"([^"]*)"/i);
     const valueMatch = tag.match(/value\s*=\s*"([^"]*)"/i);
+
     if (!nameMatch) continue;
     const name = decodeHtmlEntities(nameMatch[1]);
     const value = valueMatch ? decodeHtmlEntities(valueMatch[1]) : "";
     hidden[name] = value;
   }
+
   return hidden;
+}
+
+export interface GetFormHiddenInputsOptions {
+  baseUrl: string;
+  path: string;
+  jar: CookieJar;
+  formTestId: string;
+}
+
+/**
+ * GET de una página y lectura de los inputs ocultos de un formulario dado
+ * (típicamente el id de Server Action de Next.js), sin hacer el POST.
+ * Reutiliza los mismos extractores internos que submitForm.
+ */
+export async function getFormHiddenInputs({
+  baseUrl,
+  path,
+  jar,
+  formTestId,
+}: GetFormHiddenInputsOptions): Promise<Record<string, string>> {
+  const response = await fetch(new URL(path, baseUrl), {
+    headers: jar.header() ? { Cookie: jar.header() } : undefined,
+  });
+
+  jar.applySetCookie(response.headers.getSetCookie());
+
+  const html = await response.text();
+  const formMarkup = extractFormMarkup(html, formTestId);
+
+  return extractHiddenInputs(formMarkup);
+}
+
+export interface LoginJarOptions {
+  baseUrl: string;
+  user: TestUser;
+}
+
+/**
+ * Envía /login con form-login para el usuario de prueba dado (real HTTP, sin
+ * JavaScript) y devuelve el CookieJar ya autenticado. Lanza si la respuesta
+ * no es una redirección (3xx) — un login que no redirige es un login que
+ * falló.
+ */
+export async function loginJar({ baseUrl, user }: LoginJarOptions): Promise<CookieJar> {
+  const jar = new CookieJar();
+
+  const response = await submitForm({
+    baseUrl,
+    path: "/login",
+    jar,
+    formTestId: "form-login",
+    fields: { email: user.email, password: user.password },
+  });
+
+  if (response.status < 300 || response.status >= 400) {
+    throw new Error(
+      `loginJar: /login no redirigió para ${user.email} (status ${response.status})`,
+    );
+  }
+
+  return jar;
 }
 
 export interface SubmitFormOptions {
@@ -456,6 +748,7 @@ export async function submitForm({
   const getResponse = await fetch(new URL(path, baseUrl), {
     headers: jar.header() ? { Cookie: jar.header() } : undefined,
   });
+
   jar.applySetCookie(getResponse.headers.getSetCookie());
 
   const html = await getResponse.text();
@@ -463,9 +756,11 @@ export async function submitForm({
   const hiddenInputs = extractHiddenInputs(formMarkup);
 
   const formData = new FormData();
+
   for (const [name, value] of Object.entries(hiddenInputs)) {
     formData.append(name, value);
   }
+
   for (const [name, value] of Object.entries(fields)) {
     formData.append(name, value);
   }

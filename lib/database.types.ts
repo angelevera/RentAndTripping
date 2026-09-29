@@ -176,7 +176,7 @@ export type Database = {
       }
       reservas: {
         Row: {
-          cliente_id: string
+          cliente_id: string | null
           created_at: string
           created_by: string | null
           detalle: Json
@@ -185,12 +185,17 @@ export type Database = {
           id: string
           moneda: string
           nota_problema: string | null
+          pagador_email: string | null
+          pagador_nombre: string
+          pagador_telefono: string
           precio: number
           tipo: string
           updated_at: string
+          viajero_nombre: string | null
+          viajero_telefono: string | null
         }
         Insert: {
-          cliente_id: string
+          cliente_id?: string | null
           created_at?: string
           created_by?: string | null
           detalle?: Json
@@ -199,12 +204,17 @@ export type Database = {
           id?: string
           moneda?: string
           nota_problema?: string | null
+          pagador_email?: string | null
+          pagador_nombre: string
+          pagador_telefono: string
           precio: number
           tipo: string
           updated_at?: string
+          viajero_nombre?: string | null
+          viajero_telefono?: string | null
         }
         Update: {
-          cliente_id?: string
+          cliente_id?: string | null
           created_at?: string
           created_by?: string | null
           detalle?: Json
@@ -213,9 +223,14 @@ export type Database = {
           id?: string
           moneda?: string
           nota_problema?: string | null
+          pagador_email?: string | null
+          pagador_nombre?: string
+          pagador_telefono?: string
           precio?: number
           tipo?: string
           updated_at?: string
+          viajero_nombre?: string | null
+          viajero_telefono?: string | null
         }
         Relationships: [
           {
