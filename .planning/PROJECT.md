@@ -28,6 +28,7 @@ Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar
 - [ ] Subida de comprobante de pago (cliente) y confirmación manual (operador)
 - [ ] Panel de cliente con login propio para ver sus propias reservas y su estado
 - [ ] Avisos al cliente si algo cambia en su reserva, y recordatorios antes de fechas importantes
+- [ ] Sitio público de presentación (home), sin login, estilo Apple — quiénes somos y los servicios que ofrece Rent & Trippin (pasajes, hoteles, tours, entradas) — Fase 6, después del MVP operativo de las Fases 1-5
 
 ### Out of Scope
 
@@ -65,6 +66,7 @@ Que el operador deje de gestionar todo a mano por WhatsApp y tenga un solo lugar
 | Color de marca `#482583`, tipografía Poppins/Fredoka (títulos) + Inter (cuerpo) | Extraído directamente del logo oficial; no existe la fuente original | ✓ Good |
 | Fotografía de stock (Unsplash/Pexels) en vez de fotos propias | El negocio no tiene banco de fotos propio todavía | — Pending |
 | Una reserva distingue al pagador (quien paga, puede tener cuenta) del viajero (quien viaja, puede no tener cuenta ni correo) | Confirmado en el UAT de Fase 1: habrá clientes sin cuenta/correo, y quien paga no siempre es quien viaja | — Pending. Se implementa en Fase 2 como **migración nueva** (no se edita el esquema de reservas/pagos ya aplicado en Fase 1). La gestión de reservas de familiares por el pagador es una decisión de **alcance de Fase 3**, pero el modelo de datos de Fase 2 debe permitirla |
+| Fase 6 nueva: sitio público de presentación (home), sin login, estilo Apple | El negocio no tiene ningún escaparate fuera de Instagram/WhatsApp; se agrega después del MVP operativo (Fases 1-5) para no distraer del flujo de reservas/pagos. Usa la guía de estilo de `idea.md` sección 8 (Apple + identidad de marca morado `#482583`) | — Pending. Solo anotada en ROADMAP.md; no se ha corrido `/gsd-discuss-phase 6` ni `/gsd-plan-phase 6` todavía |
 
 ## Evolution
 

@@ -1,19 +1,19 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 2
+current_phase: 02
 current_phase_name: Gestión de reservas (admin)
-status: planning
+status: executing
 stopped_at: Phase 02 UI-SPEC approved
-last_updated: "2026-09-28T20:46:30.424Z"
+last_updated: "2026-09-29T01:19:07.454Z"
 last_activity: 2026-09-28
 last_activity_desc: Phase 01 complete, transitioned to Phase 2
-state_head: 051cc4cba5a941090e45881cd2e210b1a03121a7
+state_head: c222e1d6caaaa6bdc65a0a1c97853ea00e268f76
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 1
-  total_plans: 4
+  total_plans: 9
   completed_plans: 4
-  percent: 20
+  percent: 17
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 ## Current Position
 
-Phase: 2 — Gestión de reservas (admin)
+Phase: 02 (Gestión de reservas (admin)) — READY TO EXECUTE
 Plan: Not started
-Status: Ready to plan
+Status: Ready to execute
 Last activity: 2026-09-28 — Phase 01 complete, transitioned to Phase 2
 
-Progress: [██░░░░░░░░] 20%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
@@ -83,6 +83,10 @@ Recent decisions affecting current work:
 - [Phase 01]: app/admin/page.tsx dejado sin cambios en 01-04 — ya renderiza correctamente dentro del nuevo layout de marca, sin tocar nada propio
 - [Phase 01]: un solo esquema zod (lib/validation/auth.ts) usado tanto por zodResolver en el cliente como por safeParse en el servidor — sin reglas de validación duplicadas
 - [Phase 01]: mensaje idéntico en español para contraseña incorrecta y correo desconocido (sin revelar cuentas), con el 429 de Supabase mapeado a un mensaje de límite de intentos distinto
+
+### Roadmap Evolution
+
+- Phase 6 added: Sitio público de presentación (home) — página sin login, estilo Apple, con quiénes somos y los servicios de Rent & Trippin (pasajes, hoteles, tours, entradas); numerada después del MVP de Fases 1-5, guía de estilo en `idea.md` sección 8. Anotada en ROADMAP.md y PROJECT.md; sin discuss-phase ni plan-phase corridos todavía.
 
 ### Pending Todos
 

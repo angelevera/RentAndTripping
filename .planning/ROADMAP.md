@@ -2,7 +2,7 @@
 
 ## Overview
 
-El camino va de "nada existe todavía" a "el operador reemplazó su flujo manual de WhatsApp por una sola herramienta". Primero se construye la base de datos y el acceso seguro (Fase 1) — sin esto, nada más puede construirse con confianza. Luego el admin gana la capacidad de crear y gestionar reservas (Fase 2), que es el primer valor real: ya no depende de la memoria ni de scrollear WhatsApp. Con reservas existiendo, se abre el panel de cliente (Fase 3) para que cada cliente vea lo suyo sin preguntar. Después se añade el cobro y la confirmación de pagos (Fase 4), el punto de mayor riesgo de confianza del proyecto. Por último, avisos y recordatorios automáticos (Fase 5) cierran el ciclo — y esa misma fase termina con una prueba real con una reserva de verdad, validando que todo el flujo funciona de punta a punta antes de considerar el MVP listo.
+El camino va de "nada existe todavía" a "el operador reemplazó su flujo manual de WhatsApp por una sola herramienta". Primero se construye la base de datos y el acceso seguro (Fase 1) — sin esto, nada más puede construirse con confianza. Luego el admin gana la capacidad de crear y gestionar reservas (Fase 2), que es el primer valor real: ya no depende de la memoria ni de scrollear WhatsApp. Con reservas existiendo, se abre el panel de cliente (Fase 3) para que cada cliente vea lo suyo sin preguntar. Después se añade el cobro y la confirmación de pagos (Fase 4), el punto de mayor riesgo de confianza del proyecto. Por último, avisos y recordatorios automáticos (Fase 5) cierran el ciclo — y esa misma fase termina con una prueba real con una reserva de verdad, validando que todo el flujo funciona de punta a punta antes de considerar el MVP listo. Después de ese MVP operativo, la Fase 6 agrega la cara pública del negocio: una página de presentación sin login, estilo Apple, con quiénes somos y los servicios ofrecidos — el escaparate que hoy no existe fuera de Instagram/WhatsApp.
 
 ## Phases
 
@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Panel de cliente** - Cada cliente entra a su propia cuenta y ve solo sus reservas
 - [ ] **Phase 4: Pagos, comprobantes y confirmación** - Se registra el cobro, se sube el comprobante y el admin confirma con un clic
 - [ ] **Phase 5: Avisos, recordatorios y prueba real** - El cliente se entera de cambios y recordatorios automáticamente, validado con una reserva real
+- [ ] **Phase 6: Sitio público de presentación (home)** - Página pública estilo Apple con quiénes somos y los servicios que ofrece Rent & Trippin, sin login
 
 ## Phase Details
 
@@ -153,10 +154,34 @@ Plans:
 
 - [ ] 05-01: TBD
 
+### Phase 6: Sitio público de presentación (home)
+
+**Goal**: Rent & Trippin tiene una página pública de presentación (sin login) donde cualquier visitante entiende quiénes somos y qué servicios ofrece la agencia (pasajes, hoteles, tours, entradas), con un estilo visual cuidado tipo Apple aplicado a la identidad de marca.
+**Depends on**: Phase 1 (scaffold de Next.js, assets de marca — no depende funcionalmente de reservas/pagos/avisos de las Fases 2-5; se numera después de ellas porque cierra el milestone del MVP operativo)
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+  1. Un visitante sin cuenta (sin login) puede entrar a la página pública y navegarla completa.
+  2. La página comunica "quiénes somos" (la agencia, su propuesta).
+  3. La página presenta los servicios que ofrece Rent & Trippin: pasajes (nacionales e internacionales), hoteles, tours y entradas a conciertos.
+  4. El estilo visual sigue la guía de "Estilo visual" (sección 8 de `idea.md`): disciplina tipo Apple (fotografía grande protagonista, mucho espacio en blanco, casi cero decoración, transiciones suaves) combinada con la identidad de marca de Rent & Trippin (morado `#482583` como único color de acento, títulos bold/redondeados en Poppins o Fredoka, cuerpo de texto en Inter, botones tipo "pill" morados).
+
+**Notes:**
+
+- Sitio de solo presentación/marketing — no reemplaza ni requiere el login de admin/cliente de las Fases 1-3. Es la puerta de entrada pública al negocio, no al panel operativo.
+- Guía de estilo obligatoria: `idea.md` → sección 8 "Estilo visual" (y su referencia `DESIGN.md`, análisis del lenguaje visual de Apple). No se inventa una paleta ni tipografía nueva.
+- Pendiente de planear — no se ha corrido `/gsd-discuss-phase 6` ni `/gsd-plan-phase 6` todavía.
+
+**Plans**: TBD
+
+Plans:
+
+- [ ] 06-01: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -165,3 +190,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Panel de cliente | 0/TBD | Not started | - |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
 | 5. Avisos, recordatorios y prueba real | 0/TBD | Not started | - |
+| 6. Sitio público de presentación (home) | 0/TBD | Not started | - |
