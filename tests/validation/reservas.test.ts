@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   datosReservaDesdeFormData,
   erroresPorCampo,
+  avisoTrasEditar,
   esquemaReserva,
+  esquemaEdicionReserva,
+  filaEdicionDesdeDatos,
   filaReservaDesdeDatos,
 } from "@/lib/validation/reservas";
 
@@ -199,5 +202,60 @@ describe("esquemaReserva", () => {
     })) form.set(key, value);
     const parsed = esquemaReserva.parse(datosReservaDesdeFormData(form));
     expect(parsed.detalle).toMatchObject({ cantidadPersonas: 2, viajeros: ["Ana", "Luis"] });
+  });
+});
+
+describe("esquemaEdicionReserva y estado del proveedor", () => {
+  function entradaEdicion(estadoProveedor: string, notaProblema = "") {
+    return { ...pasaje(), estadoProveedor, notaProblema };
+  }
+
+  it("exige una explicación para marcar con problema", () => {
+    for (const nota of ["", "   "]) {
+      const result = esquemaEdicionReserva.safeParse(entradaEdicion("con_problema", nota));
+      expect(result.success).toBe(false);
+
+      if (result.success) throw new Error("Expected missing problem note to fail");
+      expect(erroresPorCampo(result.error).notaProblema).toBe(
+        "Para marcar la reserva como 'con problema' hace falta explicar qué pasó, así no se te olvida el detalle después.",
+      );
+    }
+  });
+
+  it("guarda la nota recortada cuando el estado es con_problema", () => {
+    const datos = esquemaEdicionReserva.parse(entradaEdicion("con_problema", "  Cambió el horario  "));
+    expect(filaEdicionDesdeDatos(datos)).toMatchObject({
+      estado_proveedor: "con_problema",
+      nota_problema: "Cambió el horario",
+    });
+  });
+
+  it("limpia una nota restante al salir de con_problema", () => {
+    const datos = esquemaEdicionReserva.parse(entradaEdicion("confirmada", "Nota vieja"));
+    expect(filaEdicionDesdeDatos(datos)).toMatchObject({ estado_proveedor: "confirmada", nota_problema: null });
+  });
+
+  it("rechaza estados no permitidos y un estado ausente", () => {
+    expect(esquemaEdicionReserva.safeParse(entradaEdicion("cancelada")).success).toBe(false);
+    const sinEstado = entradaEdicion("pendiente");
+    Reflect.deleteProperty(sinEstado, "estadoProveedor");
+    expect(esquemaEdicionReserva.safeParse(sinEstado).success).toBe(false);
+  });
+
+  it("limita la nota de problema a 2000 caracteres", () => {
+    const result = esquemaEdicionReserva.safeParse(entradaEdicion("confirmada", "x".repeat(2001)));
+    expect(result.success).toBe(false);
+
+    if (result.success) throw new Error("Expected long problem note to fail");
+    expect(erroresPorCampo(result.error).notaProblema).toBe("Máximo 2000 caracteres.");
+  });
+
+  it.each([
+    ["pendiente", "confirmada", "confirmada"],
+    ["confirmada", "con_problema", "problema"],
+    ["confirmada", "confirmada", "guardada"],
+    ["con_problema", "pendiente", "guardada"],
+  ] as const)("elige aviso para %s → %s", (anterior, nuevo, aviso) => {
+    expect(avisoTrasEditar(anterior, nuevo)).toBe(aviso);
   });
 });

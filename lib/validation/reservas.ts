@@ -94,7 +94,7 @@ const aBooleano = z.preprocess(
   z.boolean(),
 );
 
-export const esquemaReserva = z.object({
+const esquemaReservaBase = z.object({
   pagadorNombre: texto(120).min(1, { message: "Escribe el nombre de quien paga." }),
   pagadorTelefono: texto(30).min(1, { message: "Escribe un teléfono de contacto." }),
   pagadorEmail: z.string().trim().toLowerCase().max(254, { message: "Máximo 254 caracteres." }).email({ message: "Escribe un correo válido." }).optional().or(z.literal("")),
@@ -113,7 +113,9 @@ export const esquemaReserva = z.object({
   moneda: z.enum(MONEDAS).default("USD"),
   fechaImportante: z.union([fecha, z.literal("")]).optional(),
   detalle: esquemaDetalle,
-}).superRefine((datos, contexto) => {
+});
+
+function refinarReserva(datos: z.output<typeof esquemaReservaBase>, contexto: z.RefinementCtx) {
   if (datos.detalle.tipo === "hotel" && datos.detalle.checkOut < datos.detalle.checkIn) {
     contexto.addIssue({ code: "custom", message: "El check-out no puede ser antes del check-in.", path: ["detalle", "checkOut"] });
   }
@@ -130,11 +132,41 @@ export const esquemaReserva = z.object({
     datos.viajeroNombre = undefined;
     datos.viajeroTelefono = undefined;
   }
+}
+
+export const esquemaReserva = esquemaReservaBase.superRefine(refinarReserva);
+
+const mensajeNotaProblema = "Para marcar la reserva como 'con problema' hace falta explicar qué pasó, así no se te olvida el detalle después.";
+
+export const esquemaEstadoProveedor = z.object({
+  estadoProveedor: z.enum(ESTADOS_PROVEEDOR),
+  notaProblema: texto(2000).optional(),
+}).superRefine(refinarEstadoProveedor);
+
+function refinarEstadoProveedor(
+  datos: { estadoProveedor: (typeof ESTADOS_PROVEEDOR)[number]; notaProblema?: string },
+  contexto: z.RefinementCtx,
+) {
+  if (datos.estadoProveedor === "con_problema" && !datos.notaProblema?.trim()) {
+    contexto.addIssue({ code: "custom", message: mensajeNotaProblema, path: ["notaProblema"] });
+  }
+}
+
+export const esquemaEdicionReserva = esquemaReservaBase.extend({
+  estadoProveedor: z.enum(ESTADOS_PROVEEDOR),
+  notaProblema: texto(2000).optional(),
+}).superRefine((datos, contexto) => {
+  refinarReserva(datos, contexto);
+  refinarEstadoProveedor(datos, contexto);
 });
 
 export type EntradaReserva = z.input<typeof esquemaReserva>;
 
 export type DatosReserva = z.output<typeof esquemaReserva>;
+
+export type EntradaEdicionReserva = z.input<typeof esquemaEdicionReserva>;
+
+export type DatosEdicionReserva = z.output<typeof esquemaEdicionReserva>;
 
 interface DatosReservaCrudos {
   pagadorNombre: FormDataEntryValue | null;
@@ -146,6 +178,8 @@ interface DatosReservaCrudos {
   precio: FormDataEntryValue | null;
   moneda: FormDataEntryValue;
   fechaImportante: FormDataEntryValue;
+  estadoProveedor: FormDataEntryValue | null;
+  notaProblema: FormDataEntryValue;
   detalle: Record<string, FormDataEntryValue | null>;
 }
 
@@ -166,8 +200,26 @@ export function datosReservaDesdeFormData(formData: FormData): DatosReservaCrudo
     precio: formData.get("precio"),
     moneda: formData.get("moneda") ?? "USD",
     fechaImportante: formData.get("fechaImportante") ?? "",
+    estadoProveedor: formData.get("estadoProveedor"),
+    notaProblema: formData.get("notaProblema") ?? "",
     detalle,
   };
+}
+
+export function filaEdicionDesdeDatos(datos: DatosEdicionReserva) {
+  return {
+    ...filaReservaDesdeDatos(datos),
+    estado_proveedor: datos.estadoProveedor,
+    nota_problema: datos.estadoProveedor === "con_problema" ? datos.notaProblema?.trim() || null : null,
+  };
+}
+
+export function avisoTrasEditar(anterior: string, nuevo: string): "confirmada" | "problema" | "guardada" {
+  if (anterior !== "confirmada" && nuevo === "confirmada") return "confirmada";
+
+  if (anterior !== "con_problema" && nuevo === "con_problema") return "problema";
+
+  return "guardada";
 }
 
 export function filaReservaDesdeDatos(datos: DatosReserva) {
