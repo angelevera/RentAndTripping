@@ -130,6 +130,10 @@ Plans:
   3. Cuando el cliente paga con tarjeta, el sistema genera o adjunta un link de pago de Payoneer para completar el cobro.
   4. El admin puede confirmar el pago con un clic, y la reserva pasa de "pendiente" a "pagado".
 
+**Notes:**
+
+- **Idea de negocio pendiente de discutir (agregada 2026-09-29, durante el UAT de Fase 2):** agregar un estado "expirada" a las reservas, para cuando el cliente no paga a tiempo. Preguntas abiertas a resolver en `/gsd-discuss-phase 4`: ¿cuánto tiempo se le da al cliente para pagar antes de expirar?, ¿expira sola (automático, requeriría un job) o el admin la marca manualmente? No es un requerimiento confirmado — es una idea a evaluar junto con el resto del alcance de Fase 4.
+
 **Plans**: TBD
 
 Plans:
