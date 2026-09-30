@@ -14,6 +14,8 @@ export const AVISOS = {
   problema: "Marcada con problema.",
   invitada: "Invitación enviada.",
   reenviada: "Invitación reenviada.",
+  vinculada: "Reserva vinculada.",
+  desvinculada: "Reserva desvinculada.",
 } as const satisfies Record<string, string>;
 
 export function AvisoToast() {

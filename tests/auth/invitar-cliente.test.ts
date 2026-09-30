@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
+  adminConEnvioSimulado,
   createTestUser,
   serviceClient,
   sweepStaleTestUsers,
@@ -13,47 +14,10 @@ import { invitarCliente, reenviarInvitacion } from "@/lib/clientes/invitar";
 // confirmar vía la API de administración de Supabase Auth; reenviar borra y
 // reinvita SOLO si la cuenta sigue sin confirmar (Pitfall 2) — nunca sobre
 // una cuenta real ya en uso, protegida por el chequeo de email_confirmed_at.
-
-/**
- * SUSTITUTO TEMPORAL — requiere dominio verificado en Resend
- * (rentntrippin.com, activándose en Namecheap, 24-48h). Sin un dominio
- * verificado, la API real de Supabase Auth rechaza inviteUserByEmail() con
- * "Error sending invite email" (500) al usar el sender sandbox de Resend
- * (onboarding@resend.dev) contra un destinatario que no es el dueño de la
- * cuenta de Resend.
- *
- * En vez de vi.mock() (prohibido por anti-slop, no-module-mocking), este
- * helper construye el mismo cliente real que createAdminClient() usaría
- * (serviceClient(), ya existente en fixtures.ts) e inyecta una
- * implementación fiel de inviteUserByEmail que simula el envío exitoso
- * creando la cuenta directamente con createUser({email_confirm:false}) —
- * mismo efecto en la base de datos que produciría un invite real (fila sin
- * confirmar en auth.users + profiles vía el trigger existente), sin
- * depender del envío de correo. lib/clientes/invitar.ts sigue llamando a
- * inviteUserByEmail de verdad en producción — invitarCliente/
- * reenviarInvitacion solo aceptan este cliente como segundo argumento
- * inyectable cuando un test lo pasa explícitamente.
- *
- * Quitar esta función (y pasar a llamar invitarCliente/reenviarInvitacion
- * sin segundo argumento) en cuanto rentntrippin.com quede verificado en
- * Resend.
- */
-function adminConEnvioSimulado(): ReturnType<typeof serviceClient> {
-  const admin = serviceClient();
-
-  // SAFETY: createUser's real response ({data:{user}, error}) matches the
-  // {data:{user}, error} shape inviteUserByEmail's callers (invitarCliente/
-  // reenviarInvitacion) actually read — only data.user.id and the error
-  // presence, never a field unique to one or the other.
-  admin.auth.admin.inviteUserByEmail = (async (email: string, options?: { data?: object }) =>
-    admin.auth.admin.createUser({
-      email,
-      email_confirm: false,
-      user_metadata: options?.data,
-    })) as typeof admin.auth.admin.inviteUserByEmail;
-
-  return admin;
-}
+//
+// adminConEnvioSimulado (fixtures.ts) sustituye el envío real de
+// inviteUserByEmail mientras rentntrippin.com no esté verificado en Resend
+// — ver el comentario junto a su definición para el porqué completo.
 
 describe("invitarCliente / reenviarInvitacion (D-09/D-10/D-12)", () => {
   beforeAll(async () => {

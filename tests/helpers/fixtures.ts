@@ -304,6 +304,45 @@ export async function createReservaSinCuentaFixture({
   return { reservaId: reserva.id, pagadorNombre: nombre };
 }
 
+/** Crea una reserva huérfana con correo y teléfono explícitos para probar D-04/D-08. */
+export async function createReservaHuerfanaConContactoFixture({
+  adminId,
+  pagadorEmail,
+  pagadorTelefono = "0000-0000000",
+  pagadorNombre,
+}: {
+  adminId: string;
+  pagadorEmail: string;
+  pagadorTelefono?: string;
+  pagadorNombre: string;
+}): Promise<{ reservaId: string; pagadorEmail: string; pagadorTelefono: string }> {
+  const admin = serviceClient();
+
+  const { data: reserva, error } = await admin
+    .from("reservas")
+    .insert({
+      cliente_id: null,
+      created_by: adminId,
+      pagador_nombre: pagadorNombre,
+      pagador_email: pagadorEmail,
+      pagador_telefono: pagadorTelefono,
+      tipo: "tour",
+      detalle: { tipo: "tour", nombre: "Tour de prueba" },
+      precio: 100,
+      moneda: "USD",
+    })
+    .select("id")
+    .single();
+
+  if (error || !reserva) {
+    throw new Error(`No se pudo crear la reserva huérfana de prueba: ${error?.message}`);
+  }
+
+  trackedReservaIds.add(reserva.id);
+
+  return { reservaId: reserva.id, pagadorEmail, pagadorTelefono };
+}
+
 interface PagoFixtureParams {
   reservaId: string;
   adminId: string;
@@ -384,6 +423,51 @@ export function trackStoragePath(path: string): void {
  */
 export function trackTestUserId(id: string): void {
   trackedUserIds.add(id);
+}
+
+/**
+ * SUSTITUTO TEMPORAL — requiere dominio verificado en Resend
+ * (rentntrippin.com, activándose en Namecheap, 24-48h). Sin un dominio
+ * verificado, la API real de Supabase Auth rechaza inviteUserByEmail() con
+ * "Error sending invite email" (500) al usar el sender sandbox de Resend
+ * (onboarding@resend.dev) contra un destinatario que no es el dueño de la
+ * cuenta de Resend.
+ *
+ * En vez de vi.mock() (prohibido por anti-slop, no-module-mocking), este
+ * helper construye el mismo cliente real que createAdminClient() usaría
+ * (serviceClient()) e inyecta una implementación fiel de inviteUserByEmail
+ * que simula el envío exitoso creando la cuenta directamente con
+ * createUser({email_confirm:false}) — mismo efecto en la base de datos que
+ * produciría un invite real (fila sin confirmar en auth.users + profiles vía
+ * el trigger existente), sin depender del envío de correo. Un test que llama
+ * a invitarCliente()/reenviarInvitacion() directamente solo necesita pasar
+ * este cliente como segundo argumento si esa llamada en particular alcanza a
+ * invocar inviteUserByEmail (por ejemplo, un correo nuevo, o un reenvío
+ * sobre una cuenta todavía sin confirmar) — una llamada que retorna antes
+ * por una rama temprana (correo_duplicado, ya_confirmado) nunca llega a esa
+ * API y no lo necesita. lib/clientes/invitar.ts sigue llamando a
+ * inviteUserByEmail de verdad en producción — el default sin segundo
+ * argumento no cambia.
+ *
+ * Quitar este helper (y pasar a llamar invitarCliente/reenviarInvitacion sin
+ * segundo argumento en cada test que lo usa) en cuanto rentntrippin.com
+ * quede verificado en Resend.
+ */
+export function adminConEnvioSimulado(): ReturnType<typeof serviceClient> {
+  const admin = serviceClient();
+
+  // SAFETY: createUser's real response ({data:{user}, error}) matches the
+  // {data:{user}, error} shape inviteUserByEmail's callers (invitarCliente/
+  // reenviarInvitacion) actually read — only data.user.id and the error
+  // presence, never a field unique to one or the other.
+  admin.auth.admin.inviteUserByEmail = (async (email: string, options?: { data?: object }) =>
+    admin.auth.admin.createUser({
+      email,
+      email_confirm: false,
+      user_metadata: options?.data,
+    })) as typeof admin.auth.admin.inviteUserByEmail;
+
+  return admin;
 }
 
 /**
