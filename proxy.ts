@@ -36,7 +36,9 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
 
   if (
-    (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/cliente")) &&
+    (request.nextUrl.pathname.startsWith("/admin") ||
+      (request.nextUrl.pathname.startsWith("/cliente") &&
+        request.nextUrl.pathname !== "/cliente/completar-cuenta")) &&
     !data?.claims
   ) {
     return NextResponse.redirect(new URL("/login", request.url));
