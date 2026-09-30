@@ -14,20 +14,29 @@ export interface AdminSession {
   email: string | undefined;
 }
 
+export interface ClienteSession {
+  userId: string;
+  email: string | undefined;
+}
+
 type SessionStatus =
   | { status: "none" }
-  | { status: "not-admin" }
-  | { status: "admin"; session: AdminSession };
+  | { status: "admin"; session: AdminSession }
+  | { status: "customer"; session: ClienteSession }
+  | { status: "other" };
 
 /**
  * Única implementación de la comprobación de sesión+rol (la más crítica de
  * todo el código de seguridad): llama a getClaims() y lee profiles.role.
- * getAdminSession() y requireAdmin() son las dos únicas formas permitidas de
- * consumirla — ambas componen este resultado en vez de repetir la consulta,
- * para que una futura corrección (ej. una columna disabled) no pueda
- * aplicarse a una y olvidarse en la otra.
+ * getAdminSession(), requireAdmin() y requireCliente() (lib/auth/require-cliente.ts)
+ * son las únicas formas permitidas de consumirla — todas componen este
+ * resultado en vez de repetir la consulta, para que una futura corrección
+ * (ej. una columna disabled) no pueda aplicarse a una y olvidarse en otra.
+ * "other" es una rama defensiva prácticamente inalcanzable hoy (profiles.role
+ * tiene el CHECK admin|customer desde Fase 1) — existe para fallar seguro
+ * (mismo mensaje genérico) si esa invariante se violara fuera de banda.
  */
-const getSessionStatus = cache(async (): Promise<SessionStatus> => {
+export const getSessionStatus = cache(async (): Promise<SessionStatus> => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
@@ -42,11 +51,15 @@ const getSessionStatus = cache(async (): Promise<SessionStatus> => {
     .eq("id", claims.sub)
     .single();
 
-  if (perfil?.role !== "admin") {
-    return { status: "not-admin" };
+  if (perfil?.role === "admin") {
+    return { status: "admin", session: { userId: claims.sub, email: claims.email } };
   }
 
-  return { status: "admin", session: { userId: claims.sub, email: claims.email } };
+  if (perfil?.role === "customer") {
+    return { status: "customer", session: { userId: claims.sub, email: claims.email } };
+  }
+
+  return { status: "other" };
 });
 
 /**
@@ -57,6 +70,7 @@ const getSessionStatus = cache(async (): Promise<SessionStatus> => {
  */
 export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
   const resultado = await getSessionStatus();
+
   return resultado.status === "admin" ? resultado.session : null;
 });
 
@@ -64,8 +78,12 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
  * Variante que redirige: la usa cada página y cada Server Action del panel
  * de administración.
  *   - Sin sesión → /login
- *   - Sesión pero no admin → /login?motivo=sin-acceso (Plan 01-04 lee este
- *     query param para mostrar el mensaje correspondiente)
+ *   - Sesión pero no admin (cliente, u "other") → /login?motivo=sin-acceso
+ *     (Plan 01-04 lee este query param para mostrar el mensaje
+ *     correspondiente) — comportamiento sin cambios respecto a antes de este
+ *     plan (tests/e2e/admin-access.test.ts no se toca), salvo que el caso
+ *     "other" además cierra la sesión (ver getSessionStatus, rama defensiva
+ *     prácticamente inalcanzable — nunca el caso normal de un cliente).
  *   - Admin → devuelve { userId, email }
  */
 export async function requireAdmin(): Promise<AdminSession> {
@@ -75,7 +93,14 @@ export async function requireAdmin(): Promise<AdminSession> {
     redirect("/login");
   }
 
-  if (resultado.status === "not-admin") {
+  if (resultado.status === "other") {
+    const supabase = await createClient();
+
+    await supabase.auth.signOut({ scope: "local" });
+    redirect("/login?motivo=sin-acceso");
+  }
+
+  if (resultado.status !== "admin") {
     redirect("/login?motivo=sin-acceso");
   }
 

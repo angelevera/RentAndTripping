@@ -3,11 +3,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { esquemaLogin } from "@/lib/validation/auth";
+import { getSessionStatus } from "@/lib/auth/require-admin";
 
 export type EstadoLogin = {
   error?: string;
   errores?: { email?: string; password?: string };
 };
+
+// Un único literal (D-01/D-02): tanto credenciales inválidas como una cuenta
+// válida sin acceso reconocido devuelven exactamente este mismo mensaje, para
+// que ambos casos sean indistinguibles desde afuera.
+const MENSAJE_CREDENCIALES_INVALIDAS = "Correo o contraseña incorrectos.";
 
 /**
  * Server Action del formulario de login. Valida en el servidor (un cliente
@@ -26,6 +32,7 @@ export async function iniciarSesion(
 
   if (!resultado.success) {
     const campos = resultado.error.flatten().fieldErrors;
+
     return {
       errores: {
         email: campos.email?.[0],
@@ -39,7 +46,7 @@ export async function iniciarSesion(
 
   if (error) {
     if (error.code === "invalid_credentials" || error.status === 400) {
-      return { error: "Correo o contraseña incorrectos." };
+      return { error: MENSAJE_CREDENCIALES_INVALIDAS };
     }
 
     if (error.status === 429 || error.code === "over_request_rate_limit") {
@@ -47,8 +54,21 @@ export async function iniciarSesion(
     }
 
     console.error("Error inesperado al iniciar sesión:", error);
+
     return { error: "No pudimos iniciar sesión en este momento. Inténtalo de nuevo en unos minutos." };
   }
 
-  redirect("/admin");
+  const estadoSesion = await getSessionStatus();
+
+  if (estadoSesion.status === "admin") {
+    redirect("/admin");
+  }
+
+  if (estadoSesion.status === "customer") {
+    redirect("/cliente");
+  }
+
+  await supabase.auth.signOut({ scope: "local" });
+
+  return { error: MENSAJE_CREDENCIALES_INVALIDAS };
 }

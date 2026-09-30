@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getAdminSession } from "@/lib/auth/require-admin";
+import { getSessionStatus } from "@/lib/auth/require-admin";
 import { LoginForm } from "./login-form";
 
 export default async function LoginPage({
@@ -7,8 +7,14 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  if (await getAdminSession()) {
+  const estadoSesion = await getSessionStatus();
+
+  if (estadoSesion.status === "admin") {
     redirect("/admin");
+  }
+
+  if (estadoSesion.status === "customer") {
+    redirect("/cliente");
   }
 
   const params = await searchParams;

@@ -6,10 +6,11 @@ import { NextResponse, type NextRequest } from "next/server";
 // dos responsabilidades, y ninguna más:
 //   1. Refrescar la sesión de Supabase en cada request (la llamada a
 //      getClaims() de abajo es lo que dispara el refresh).
-//   2. Un redirect optimista de UX para visitantes anónimos de /admin.
-// El proxy NUNCA decide el rol de admin: eso es trabajo de la página
-// (lib/auth/require-admin.ts) más RLS en Postgres, que es el límite real de
-// autorización.
+//   2. Un redirect optimista de UX para visitantes anónimos de /admin o
+//      /cliente.
+// El proxy NUNCA decide el rol de admin ni de cliente: eso es trabajo de la
+// página (lib/auth/require-admin.ts, lib/auth/require-cliente.ts) más RLS en
+// Postgres, que es el límite real de autorización.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -34,7 +35,10 @@ export async function proxy(request: NextRequest) {
   // getClaims() lo que refresca la sesión.
   const { data } = await supabase.auth.getClaims();
 
-  if (request.nextUrl.pathname.startsWith("/admin") && !data?.claims) {
+  if (
+    (request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/cliente")) &&
+    !data?.claims
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
