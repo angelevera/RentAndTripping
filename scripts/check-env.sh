@@ -8,6 +8,7 @@ cd "$(dirname "$0")/.."
 VARS=(
   "NEXT_PUBLIC_SUPABASE_URL:.env.local"
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:.env.local"
+  "SUPABASE_SECRET_KEY:.env.local"
   "SUPABASE_SECRET_KEY:.env.admin.local"
   "SUPABASE_PROJECT_REF:.env.admin.local"
   "SUPABASE_DB_PASSWORD:.env.admin.local"

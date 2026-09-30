@@ -378,6 +378,15 @@ export function trackStoragePath(path: string): void {
 }
 
 /**
+ * Registra un userId creado por una vía que no es createTestUser (por
+ * ejemplo, directamente por invitarCliente/reenviarInvitacion en un test) en
+ * el mismo Set que cleanupTestUsers ya recorre, para que se borre igual.
+ */
+export function trackTestUserId(id: string): void {
+  trackedUserIds.add(id);
+}
+
+/**
  * Elimina todos los usuarios de prueba creados por este proceso, y todo lo
  * que dependa de ellos primero: comprobantes rastreados, luego recordatorios,
  * luego pagos, luego reservas (pagos restringe el borrado de reservas, así

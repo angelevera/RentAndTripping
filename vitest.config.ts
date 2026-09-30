@@ -46,6 +46,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL(".", import.meta.url)),
+      // Outside Next.js's bundler the real "server-only" package throws
+      // unconditionally (it has no way to tell a Vitest/Node import apart
+      // from a browser one) — aliased to an empty stub so db-project tests
+      // can import server-only-guarded modules directly. See
+      // tests/helpers/server-only-stub.ts for the full rationale.
+      "server-only": fileURLToPath(new URL("./tests/helpers/server-only-stub.ts", import.meta.url)),
     },
   },
 });

@@ -12,6 +12,8 @@ export const AVISOS = {
   guardada: "Cambios guardados.",
   confirmada: "Marcada como confirmada con el proveedor.",
   problema: "Marcada con problema.",
+  invitada: "Invitación enviada.",
+  reenviada: "Invitación reenviada.",
 } as const satisfies Record<string, string>;
 
 export function AvisoToast() {
@@ -38,8 +40,8 @@ export function AvisoToast() {
     // React Strict Mode (no ocurre en producción) — preferible a que el aviso
     // real deje de mostrarse después del primero.
     // SAFETY: la línea anterior (`aviso in AVISOS`) ya probó que `aviso` es
-    // una de las cuatro claves literales de AVISOS, algo que el compilador
-    // no puede inferir solo del `in` sobre un string proveniente de la URL.
+    // una de las claves literales de AVISOS, algo que el compilador no puede
+    // inferir solo del `in` sobre un string proveniente de la URL.
     toast.success(AVISOS[aviso as keyof typeof AVISOS]);
 
     const params = new URLSearchParams(searchParams.toString());
