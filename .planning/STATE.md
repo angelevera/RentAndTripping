@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 ## Current Position
 
-Phase: 03 (Panel de cliente) — READY TO EXECUTE
-Current Plan: Not started
+Phase: 03 (Panel de cliente) — EN EJECUCIÓN (Wave 1/3 completa)
+Current Plan: 03-01 completo (commit `3e6f9ac`) — siguiente: Wave 2 (03-02, 03-03, 03-04), delegada a Codex
 Total Plans in Phase: 5
-Status: Ready to execute
-Last activity: 2026-09-29 — Phase 02 UAT cerrado (parcial)
+Status: Wave 1 completa, Wave 2 pendiente
+Last activity: 2026-09-30 — 03-01 (WR-01 + panel mínimo de cliente) implementado directamente por Claude (excepción de seguridad D-20), gate anti-slop + code-review pasado
 
 Progress: [██░░░░░░░░] 17%
 
@@ -66,6 +66,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01 P04 | 25min | 2 tasks | 9 files |
 | Phase 02 P01 | 95min | 3 tasks | 11 files |
 | Phase 02 P02 | 30min | 3 tasks | 27 files |
+| Phase 03 P01 | 55min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [Phase 02]: Plan 02-02: el componente 'form' del PLAN es un stub no funcional en el estilo radix-nova de shadcn 4.21.0 (confirmado contra el registro en vivo); se instaló 'field' en su lugar sin tocar la lista de paquetes aprobados — planes futuros que construyan el formulario de reserva deben componer Field/FieldLabel/FieldError, no Form/FormField
 - [Phase 02]: UAT cerrado como `partial` (aceptado por el dueño 2026-09-29) — 6/7 pruebas humanas pasaron, incluyendo la corrección WR-01 (segundo toast en una sesión); la única bloqueada es correr `npm test` completo en una sola corrida, por el límite de tasa de sign-in de Supabase Auth (estructural, no defecto de código, ver [[project_supabase_auth_rate_limit]])
 - [Phase 02]: Bug encontrado y corregido durante el UAT: `tests/e2e/global-setup.ts` revisaba `process.env.E2E_BASE_URL` antes de cargar `.env.admin.local` con `loadEnv()`, por lo que la variable nunca se leía — reordenado, `E2E_BASE_URL` ahora sí sobreescribe el servidor de pruebas efímero (commit `8b59e07`)
+- [Phase 03 P01]: WR-01 cerrado con rama de login de tres vías (admin/customer/no reconocido); requireCliente() nuevo, compone getSessionStatus() ya exportado, nunca una segunda consulta a profiles. Implementado directamente por Claude (Sonnet, effort alto) — excepción de seguridad D-20, con gate anti-slop + `/code-review high` corrido antes de cerrar (D-22)
+- [Phase 03 P01]: requireAdmin() y requireCliente() se mantienen deliberadamente asimétricos en su redirect de fallo (requireCliente() manda a un admin autenticado a /admin; requireAdmin() mantiene sin cambios su comportamiento previo a este plan para un cliente autenticado — genérico /login?motivo=sin-acceso, sin bounce a /cliente) — un primer intento de "simetrizar" ambos rompió tests/e2e/admin-access.test.ts (regresión de Fase 1 explícitamente bloqueada por el plan); revertido
 
 ### Roadmap Evolution
 
