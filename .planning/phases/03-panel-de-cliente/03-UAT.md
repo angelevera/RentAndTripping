@@ -1,14 +1,14 @@
 ---
-status: partial
+status: complete
 phase: 03-panel-de-cliente
 source: [03-VERIFICATION.md]
 started: 2026-09-30T14:20:39Z
-updated: 2026-09-30T15:45:00Z
+updated: 2026-09-30T18:10:00Z
 ---
 
 ## Current Test
 
-[testing paused — 1 item outstanding: test 2 blocked by Namecheap/Resend domain]
+[testing complete]
 
 ## Tests
 
@@ -18,9 +18,8 @@ result: pass
 
 ### 2. Verificar rentntrippin.com en Resend y activar los 2 e2e condicionales
 expected: con RESEND_DOMINIO_VERIFICADO=1 pasan los 2 casos de tests/e2e/clientes-lista.test.ts; se puede quitar adminConEnvioSimulado()
-result: blocked
-blocked_by: third-party
-reason: "rentntrippin.com aún no está activo en Namecheap (24-48h desde la compra). Cuando aparezca Advanced DNS, agrego los registros de Resend, verifico el dominio y activo RESEND_DOMINIO_VERIFICADO=1 en .env.local. Los 2 tests condicionados quedan como pendientes documentados, no bloquean el cierre de la fase."
+result: pass
+note: "rentntrippin.com verificado en Resend; remitente de Supabase SMTP cambiado a no-reply@rentntrippin.com; con RESEND_DOMINIO_VERIFICADO=1 pasan los 6 tests de tests/e2e/clientes-lista.test.ts (0 omitidos)."
 
 ### 3. Flujo real con un correo de verdad
 expected: invitar desde /admin/clientes, abrir el enlace, elegir contraseña, iniciar sesión y aterrizar en /cliente
@@ -38,10 +37,10 @@ result: pass
 ## Summary
 
 total: 5
-passed: 4
+passed: 5
 issues: 0
 pending: 0
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
