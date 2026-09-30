@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 ## Current Position
 
-Phase: 03 (Panel de cliente) — EN EJECUCIÓN (Wave 1/3 completa)
-Current Plan: 03-01 completo (commit `3e6f9ac`) — siguiente: Wave 2 (03-02, 03-03, 03-04), delegada a Codex
+Phase: 03 (Panel de cliente) — EN EJECUCIÓN (Wave 2/3 en curso — 2/3 planes de esta wave listos)
+Current Plan: 03-02 completo (commit `4dfd48a`) — siguiente: 03-03 (checkpoint humano) y 03-04, ambos delegados a Codex
 Total Plans in Phase: 5
-Status: Wave 1 completa, Wave 2 pendiente
-Last activity: 2026-09-30 — 03-01 (WR-01 + panel mínimo de cliente) implementado directamente por Claude (excepción de seguridad D-20), gate anti-slop + code-review pasado
+Status: 03-01 y 03-02 completos; 03-03/03-04 (Wave 2) y 03-05 (Wave 3) pendientes
+Last activity: 2026-09-30 — 03-02 (panel completo de /cliente: insignias duales, "Para:", split Próximas/Historial, CTA de WhatsApp aislado) delegado a Codex (D-20), auditado y corregido por Claude (2 bugs reales + hallazgos anti-slop), gate anti-slop + code-review pasado
 
 Progress: [██░░░░░░░░] 17%
 
@@ -67,6 +67,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P01 | 95min | 3 tasks | 11 files |
 | Phase 02 P02 | 30min | 3 tasks | 27 files |
 | Phase 03 P01 | 55min | 2 tasks | 8 files |
+| Phase 03 P02 | 30min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,7 @@ Recent decisions affecting current work:
 - [Phase 02]: Bug encontrado y corregido durante el UAT: `tests/e2e/global-setup.ts` revisaba `process.env.E2E_BASE_URL` antes de cargar `.env.admin.local` con `loadEnv()`, por lo que la variable nunca se leía — reordenado, `E2E_BASE_URL` ahora sí sobreescribe el servidor de pruebas efímero (commit `8b59e07`)
 - [Phase 03 P01]: WR-01 cerrado con rama de login de tres vías (admin/customer/no reconocido); requireCliente() nuevo, compone getSessionStatus() ya exportado, nunca una segunda consulta a profiles. Implementado directamente por Claude (Sonnet, effort alto) — excepción de seguridad D-20, con gate anti-slop + `/code-review high` corrido antes de cerrar (D-22)
 - [Phase 03 P01]: requireAdmin() y requireCliente() se mantienen deliberadamente asimétricos en su redirect de fallo (requireCliente() manda a un admin autenticado a /admin; requireAdmin() mantiene sin cambios su comportamiento previo a este plan para un cliente autenticado — genérico /login?motivo=sin-acceso, sin bounce a /cliente) — un primer intento de "simetrizar" ambos rompió tests/e2e/admin-access.test.ts (regresión de Fase 1 explícitamente bloqueada por el plan); revertido
+- [Phase 03 P02]: primer plan de la fase delegado a Codex (`/codex:rescue`, corre en background — `/codex:status` y `/codex:result` tienen `disable-model-invocation: true`, solo el usuario puede dispararlos). Claude auditó el resultado corriendo el `<verify>` del propio plan y encontró 2 bugs reales (orden de filas asumido por posición en vez de id capturado; comentario SSR de React partiendo un substring "Para: {nombre}" buscado por un test) más hallazgos de anti-slop, antes de pasar el gate `/code-review high` (D-22) limpio
 
 ### Roadmap Evolution
 
