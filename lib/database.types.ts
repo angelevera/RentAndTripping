@@ -254,7 +254,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      clientes_estado_invitacion: {
+        Args: { ids: string[] }
+        Returns: {
+          confirmado_en: string
+          id: string
+          invitado_en: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
