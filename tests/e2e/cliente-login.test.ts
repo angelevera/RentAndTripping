@@ -220,6 +220,8 @@ describe("cliente login (/login -> /cliente, cierre de WR-01)", () => {
 
     expect(body).toContain('data-testid="panel-cliente"');
     expect(body).toContain('data-testid="reserva-cliente"');
+    expect(body).toContain('data-testid="whatsapp-cta-flotante"');
+    expect(body).toContain(encodeURIComponent("Hola, quiero pedir una cotización para un nuevo viaje"));
     // "Tour" (capitalizado): desde 03-02 el tipo se muestra vía la etiqueta
     // traducida (etiquetaDesde/ETIQUETAS_TIPO), no el valor crudo de la BD.
     expect(body).toContain("Tour");
@@ -330,6 +332,7 @@ describe("cliente login (/login -> /cliente, cierre de WR-01)", () => {
     expect(body).not.toContain("Próximas");
     expect(body).not.toContain("Historial");
     expect(body).toContain('data-testid="whatsapp-cta"');
+    expect(body).not.toContain("whatsapp-cta-flotante");
     expect(body).toContain("wa.me/");
     expect(body).toContain(encodeURIComponent("Hola, quiero planificar un viaje"));
   });

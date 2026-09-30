@@ -8,7 +8,7 @@ export default async function ClientePage() {
   const cliente = await requireCliente();
 
   return (
-    <main data-testid="panel-cliente" className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
+    <main data-testid="panel-cliente" className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pt-12 pb-28">
       <h1 className="font-display text-2xl font-bold">Mis reservas</h1>
       <Suspense fallback={<ListaReservasClienteSkeleton />}>
         <ListaReservasCliente clienteId={cliente.userId} />

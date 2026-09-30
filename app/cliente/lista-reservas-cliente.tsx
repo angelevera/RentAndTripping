@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { listarReservasCliente, type FilaReservaCliente } from "@/lib/reservas/listar-cliente";
 import { createClient } from "@/lib/supabase/server";
 import { ETIQUETAS_ESTADO_PROVEEDOR, ETIQUETAS_TIPO, etiquetaDesde } from "@/lib/validation/reservas";
-import { WhatsappCta } from "@/components/whatsapp-cta";
+import { WhatsappCta, WhatsappFlotante } from "@/components/whatsapp-cta";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const BADGE_GRIS = "bg-gray-100 text-gray-700";
@@ -117,5 +117,5 @@ export async function ListaReservasCliente({ clienteId }: { clienteId: string })
 
   const { proximas, historial } = dividirPorFecha(filas);
 
-  return <><SeccionReservas titulo="Próximas" filas={proximas} /><Separator /><SeccionReservas titulo="Historial" filas={historial} /></>;
+  return <><SeccionReservas titulo="Próximas" filas={proximas} /><Separator /><SeccionReservas titulo="Historial" filas={historial} /><WhatsappFlotante /></>;
 }
