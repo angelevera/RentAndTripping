@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Base y acceso seguro** - Base de datos protegida y el admin puede iniciar sesión (completed 2026-09-28)
 - [x] **Phase 2: Gestión de reservas (admin)** - El admin crea, edita y da seguimiento a todas las reservas en un solo lugar (completed 2026-09-29 — parcial: 6/7 UAT pasaron, 1 bloqueado por límite estructural de Supabase Auth, aceptado por el dueño)
-- [ ] **Phase 3: Panel de cliente** - Cada cliente entra a su propia cuenta y ve solo sus reservas
+- [x] **Phase 3: Panel de cliente** - Cada cliente entra a su propia cuenta y ve solo sus reservas
 - [ ] **Phase 4: Pagos, comprobantes y confirmación** - Se registra el cobro, se sube el comprobante y el admin confirma con un clic
 - [ ] **Phase 5: Avisos, recordatorios y prueba real** - El cliente se entera de cambios y recordatorios automáticamente, validado con una reserva real
 - [ ] **Phase 6: Sitio público de presentación (home)** - Página pública estilo Apple con quiénes somos y los servicios que ofrece Rent & Trippin, sin login
