@@ -19,9 +19,12 @@ export default async function AdminPage({
     <main data-testid="panel-admin" className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Reservas</h1>
-        <Button asChild className="min-h-11 rounded-full bg-primary text-primary-foreground active:scale-95">
-          <Link href="/admin/reservas/nueva">Crear reserva</Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="min-h-11"><Link href="/admin/clientes">Clientes</Link></Button>
+          <Button asChild className="min-h-11 rounded-full bg-primary text-primary-foreground active:scale-95">
+            <Link href="/admin/reservas/nueva">Crear reserva</Link>
+          </Button>
+        </div>
       </div>
 
       <FiltrosReservas valores={parametros} />

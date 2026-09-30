@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   adminConEnvioSimulado,
+  createReservaHuerfanaConContactoFixture,
   createTestUser,
   serviceClient,
   sweepStaleTestUsers,
@@ -108,6 +109,38 @@ describe("invitarCliente / reenviarInvitacion (D-09/D-10/D-12)", () => {
     // cuenta nueva, distinta y todavía sin confirmar.
     expect(nuevo?.user?.id).toBe(resultado.userId);
     expect(nuevo?.user?.email_confirmed_at).toBeFalsy();
+  });
+
+  it("reenviarInvitacion conserva las reservas vinculadas y las pasa a la cuenta nueva", async () => {
+    const adminDePrueba = await createTestUser("admin");
+    const email = `${TEST_PREFIX}-reenvio-vinculada-${Date.now()}@example.com`;
+    const redirectTo = "http://localhost:3000/cliente/completar-cuenta";
+    const primera = await invitarCliente({ email, nombre: "Con reserva", redirectTo }, adminConEnvioSimulado());
+
+    expect(primera.ok).toBe(true);
+    if (!primera.ok) return;
+    trackTestUserId(primera.userId);
+
+    const reserva = await createReservaHuerfanaConContactoFixture({
+      adminId: adminDePrueba.id,
+      pagadorEmail: email,
+      pagadorNombre: "Con reserva",
+    });
+    const service = serviceClient();
+    await service.from("reservas").update({ cliente_id: primera.userId }).eq("id", reserva.reservaId);
+
+    const resultado = await reenviarInvitacion(
+      { userId: primera.userId, email, nombre: "Con reserva", redirectTo },
+      adminConEnvioSimulado(),
+    );
+
+    expect(resultado.ok).toBe(true);
+    if (!resultado.ok) return;
+    trackTestUserId(resultado.userId);
+
+    expect(resultado.userId).not.toBe(primera.userId);
+    const { data } = await service.from("reservas").select("cliente_id").eq("id", reserva.reservaId).single();
+    expect(data?.cliente_id).toBe(resultado.userId);
   });
 
   it("reenviarInvitacion sobre una cuenta ya confirmada devuelve ya_confirmado sin tocarla", async () => {

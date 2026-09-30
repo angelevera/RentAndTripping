@@ -90,10 +90,38 @@ export async function reenviarInvitacion(
     return { ok: false, error: "ya_confirmado" };
   }
 
+  // reservas.cliente_id es ON DELETE RESTRICT: con una reserva vinculada,
+  // deleteUser fallaría. Se sueltan primero y se re-vinculan a la cuenta nueva;
+  // si algo falla después, quedan huérfanas (nunca perdidas) y la próxima
+  // invitación las vuelve a enlazar por coincidencia exacta.
+  const { data: vinculadas, error: errorVinculadas } = await admin
+    .from("reservas")
+    .select("id")
+    .eq("cliente_id", userId);
+
+  if (errorVinculadas) {
+    console.error("Error al leer las reservas vinculadas antes de reenviar:", errorVinculadas);
+
+    return { ok: false, error: "error" };
+  }
+
+  const idsVinculadas = (vinculadas ?? []).map((reserva) => reserva.id);
+
+  if (idsVinculadas.length > 0) {
+    const { error: errorSoltar } = await admin.from("reservas").update({ cliente_id: null }).in("id", idsVinculadas);
+
+    if (errorSoltar) {
+      console.error("Error al soltar las reservas vinculadas antes de reenviar:", errorSoltar);
+
+      return { ok: false, error: "error" };
+    }
+  }
+
   const { error: errorBorrado } = await admin.auth.admin.deleteUser(userId);
 
   if (errorBorrado) {
     console.error("Error al borrar la invitación pendiente antes de reenviar:", errorBorrado);
+    await admin.from("reservas").update({ cliente_id: userId }).in("id", idsVinculadas);
 
     return { ok: false, error: "error" };
   }
@@ -107,6 +135,19 @@ export async function reenviarInvitacion(
     console.error("Error al reenviar la invitación:", errorInvite);
 
     return { ok: false, error: "error" };
+  }
+
+  if (idsVinculadas.length > 0) {
+    const { error: errorRevincular } = await admin
+      .from("reservas")
+      .update({ cliente_id: nuevo.user.id })
+      .in("id", idsVinculadas);
+
+    if (errorRevincular) {
+      console.error("Error al re-vincular las reservas tras reenviar la invitación:", errorRevincular);
+
+      return { ok: false, error: "error" };
+    }
   }
 
   return { ok: true, userId: nuevo.user.id };
