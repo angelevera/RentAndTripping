@@ -118,7 +118,7 @@ Plans:
 
 - [x] 03-01-PLAN.md
 - [x] 03-02-PLAN.md
-- [ ] 03-03-PLAN.md
+- [x] 03-03-PLAN.md
 - [ ] 03-04-PLAN.md
 - [ ] 03-05-PLAN.md
 
@@ -200,7 +200,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Base y acceso seguro | 4/4 | Complete    | 2026-09-28 |
 | 2. Gestión de reservas (admin) | 5/5 | Complete (parcial — ver nota) | 2026-09-29 |
-| 3. Panel de cliente | 2/5 | In Progress|  |
+| 3. Panel de cliente | 3/5 | In Progress|  |
 | 4. Pagos, comprobantes y confirmación | 0/TBD | Not started | - |
 | 5. Avisos, recordatorios y prueba real | 0/TBD | Not started | - |
 | 6. Sitio público de presentación (home) | 0/TBD | Not started | - |

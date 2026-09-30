@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-09-27)
 
 ## Current Position
 
-Phase: 03 (Panel de cliente) — EN EJECUCIÓN (Wave 2/3 en curso — 2/3 planes de esta wave listos)
-Current Plan: 03-02 completo (commit `4dfd48a`) — siguiente: 03-03 (checkpoint humano) y 03-04, ambos delegados a Codex
+Phase: 03 (Panel de cliente) — EN EJECUCIÓN (Wave 2/3 en curso — 3/3 planes de esta wave listos)
+Current Plan: 03-03 completo (commits `9036be3`, `b72b5d7`) — siguiente: 03-04 (Wave 2, delegado a Codex), luego 03-05 (Wave 3, depende de 03-03)
 Total Plans in Phase: 5
-Status: 03-01 y 03-02 completos; 03-03/03-04 (Wave 2) y 03-05 (Wave 3) pendientes
-Last activity: 2026-09-30 — 03-02 (panel completo de /cliente: insignias duales, "Para:", split Próximas/Historial, CTA de WhatsApp aislado) delegado a Codex (D-20), auditado y corregido por Claude (2 bugs reales + hallazgos anti-slop), gate anti-slop + code-review pasado
+Status: 03-01, 03-02 y 03-03 completos; 03-04 (Wave 2) y 03-05 (Wave 3) pendientes
+Last activity: 2026-09-30 — 03-03 completo: Task 1 (cliente de servicio confinado + ciclo de invitación real, D-09/D-10/D-12) implementado directamente por Claude tras checkpoint humano aprobado ("confinado"); Task 2 (vincular/desvincular reservas huérfanas, D-04/D-05/D-07/D-08) delegado a Codex, auditado y corregido por Claude (bug real de escapado en filtro .or() de PostgREST + limpieza de code-review). SUPABASE_SECRET_KEY ahora también en .env.local; bloqueado el envío real de invitación hasta verificar rentntrippin.com en Resend (24-48h) — tests usan un sustituto temporal documentado, código de producción sin cambios
 
 Progress: [██░░░░░░░░] 17%
 
@@ -68,6 +68,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P02 | 30min | 3 tasks | 27 files |
 | Phase 03 P01 | 55min | 2 tasks | 8 files |
 | Phase 03 P02 | 30min | 2 tasks | 5 files |
+| Phase 03 P03 | 105min | 2 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,10 @@ Recent decisions affecting current work:
 - [Phase 03 P01]: WR-01 cerrado con rama de login de tres vías (admin/customer/no reconocido); requireCliente() nuevo, compone getSessionStatus() ya exportado, nunca una segunda consulta a profiles. Implementado directamente por Claude (Sonnet, effort alto) — excepción de seguridad D-20, con gate anti-slop + `/code-review high` corrido antes de cerrar (D-22)
 - [Phase 03 P01]: requireAdmin() y requireCliente() se mantienen deliberadamente asimétricos en su redirect de fallo (requireCliente() manda a un admin autenticado a /admin; requireAdmin() mantiene sin cambios su comportamiento previo a este plan para un cliente autenticado — genérico /login?motivo=sin-acceso, sin bounce a /cliente) — un primer intento de "simetrizar" ambos rompió tests/e2e/admin-access.test.ts (regresión de Fase 1 explícitamente bloqueada por el plan); revertido
 - [Phase 03 P02]: primer plan de la fase delegado a Codex (`/codex:rescue`, corre en background — `/codex:status` y `/codex:result` tienen `disable-model-invocation: true`, solo el usuario puede dispararlos). Claude auditó el resultado corriendo el `<verify>` del propio plan y encontró 2 bugs reales (orden de filas asumido por posición en vez de id capturado; comentario SSR de React partiendo un substring "Para: {nombre}" buscado por un test) más hallazgos de anti-slop, antes de pasar el gate `/code-review high` (D-22) limpio
+- [Phase 03 P03]: checkpoint humano (blocking-human) aprobado por el usuario ("confinado") antes de crear lib/supabase/admin.ts — expone SUPABASE_SECRET_KEY al runtime de la app por primera vez, confinado a un solo archivo/un solo importador. Task 1 (invitar/reenviar) implementado directamente por Claude (excepción de seguridad D-20); Task 2 (vincular/desvincular) delegado a Codex
+- [Phase 03 P03]: invitarCliente/reenviarInvitacion real contra Supabase chocó en cadena con @example.com inválido → rate limit de correo por defecto → sender sandbox de Resend solo entrega al dueño de la cuenta — resuelto con TEST_EMAIL_DOMAIN=mailinator.com + SMTP de Resend configurado por el usuario + un sustituto de prueba (adminConEnvioSimulado en fixtures.ts, compartido entre los dos archivos de test) que nunca toca el código de producción; pendiente verificar rentntrippin.com en Resend (24-48h) para activar el envío real
+- [Phase 03 P03]: anti-slop prohíbe vi.mock() (no-module-mocking) — en vez de mockear el módulo, invitarCliente/reenviarInvitacion ahora aceptan un cliente admin inyectable como segundo argumento opcional (default sin cambios: createAdminClient() real)
+- [Phase 03 P03]: bug real encontrado en la auditoría de Codex — buscarReservasHuerfanas interpolaba escaparPatronLike() directo en un filtro .or() de PostgREST, pero esa función solo escapa metacaracteres de LIKE, no coma/paréntesis (los delimitadores propios de la gramática .or()); corregido con paraFiltroOr() (comillas dobles, mismo mecanismo que documenta PostgREST) + prueba de regresión
 
 ### Roadmap Evolution
 
