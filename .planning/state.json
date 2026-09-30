@@ -1,0 +1,43 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Base y acceso seguro",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Gestión de reservas (admin)",
+      "status": "pending"
+    },
+    {
+      "number": "3",
+      "name": "Panel de cliente",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Pagos, comprobantes y confirmación",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "Avisos, recordatorios y prueba real",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Sitio público de presentación (home)",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd:progress --next",
+    "label": "Advance to the next step",
+    "reason": "Phase 03 of 6 · 17% · executing"
+  },
+  "updated_at": "2026-09-30T10:29:06.902Z"
+}

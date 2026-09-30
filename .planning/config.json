@@ -90,5 +90,8 @@
     "source_grounding_authority": "grep"
   },
   "mode": "interactive",
-  "granularity": "standard"
+  "granularity": "standard",
+  "model_overrides": {
+    "gsd-planner": "sonnet"
+  }
 }
